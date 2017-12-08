@@ -1,3 +1,4 @@
+--http://exercism.io/exercises/haskell/triangle/readme
 data Triangle = Triangle { s1 :: Int
                             , s2 :: Int
                             , s3 :: Int

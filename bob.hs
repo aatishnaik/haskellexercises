@@ -1,3 +1,4 @@
+--http://exercism.io/exercises/haskell/bob/readme
 getlast :: [a] -> a
 getlast [x] = x
 getlast (_:xs) = getlast xs

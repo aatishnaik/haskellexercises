@@ -1,3 +1,4 @@
+--http://exercism.io/exercises/haskell/collatz-conjecture/readme
 collaz :: Int -> Int
 collaz x = if (x `mod` 2) == 0
     then x `div` 2
