@@ -10,9 +10,10 @@ merge (x:xs) (y:ys) = x : y : merge xs ys
 createmap = ['a'..'z']
 geti x xs k= createmap !! ((head (Data.List.elemIndices x xs))+k)
 
-toString :: Char -> String
-toString c = [c]
-rotation x k = map (toString(geti (head x) x k)) x
+rotation :: Int -> String -> String
+rotation n = map $xs n
+    where xs x =  chr . (+ x) . ord
+
 main :: IO()
 main = do
     print (rotation "bbbb" 3)

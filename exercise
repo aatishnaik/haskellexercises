@@ -1,0 +1,48 @@
+3 `elem` [1..10]
+elemIndex 'x' ['a'..'z']
+filter (>4) [1..10]
+[1..10] ++ [3..10]
+words "the dog is mad"
+
+data Node x = Ptr (Node x) | Ele x (Node x) | Last x
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+data DoubleList a  = LeftEnd  a (DoubleList a) | Middle   a (DoubleList a) (DoubleList a) | RightEnd a (DoubleList a)
