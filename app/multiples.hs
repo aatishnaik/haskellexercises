@@ -1,3 +1,4 @@
+checkmul :: Int -> Int
 checkmul x = if ( x `mod` 3) == 0
     then x
     else if ( x `mod` 5) == 0
@@ -5,6 +6,8 @@ checkmul x = if ( x `mod` 3) == 0
     else 0
 
 tolist x = [x]
+
+findmul :: [Int] -> [Int]
 findmul [] = [0]
 findmul xs = (tolist (checkmul (head xs))) ++ (findmul (tail xs))
 main :: IO()

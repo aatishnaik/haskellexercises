@@ -6,7 +6,7 @@ merge [] [] = []
 merge x [] = x
 merge [] x = x
 merge (x:xs) (y:ys) = x : y : merge xs ys
-
+createmap :: String
 createmap = ['a'..'z']
 geti x xs k= createmap !! ((head (Data.List.elemIndices x xs))+k)
 
