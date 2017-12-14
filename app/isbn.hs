@@ -19,7 +19,7 @@ cdigit :: String -> Int -> Bool
 cdigit x 1 = cdigit (tail x) 2
 cdigit x 5 = cdigit (tail x) 6
 cdigit x 11 = cdigit (tail x) 12
-cdigit x 12 = if isDigit (head x)
+cdigit x 12 = if (isDigit (head x)) || ((head x) == 'X')
     then True
     else False
 cdigit [] n = True
@@ -45,4 +45,4 @@ checkisbn x = if (cformat x) && (cdigit x 0)
     else False
 
 main ::IO()
-main = print (checkisbn "1-123-12345-1")
+main = print (checkisbn "1-123012345-1")
