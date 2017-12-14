@@ -37,3 +37,6 @@ calsum x n
 checkisbn x = if (cformat x) && (cdigit x 0)
     then ((calsum x 12) `mod` 11) == 0
     else False
+
+main ::IO()
+main = print (checkisbn "1-123-12345-1")
