@@ -1,48 +1,34 @@
 import Data.List
 import Data.Char
+rmdash :: String -> String
+rmdash x = filter (/='-') x
 
-cformat :: String -> Bool
-cformat x = if (length x) == 13
-    then if (x!!1) == '-'
-        then if (x!!5) == '-'
-            then if (x!!11) == '-'
-                then True
-                else False
-            else False
-        else False
+cformat :: String -> String
+cformat x
+    | (length x) == 13 = if cdigit (rmdash x)
+        then rmdash x
+        else ""
+    | (length x) == 10 = if cdigit x
+        then x
+        else ""
+    | otherwise = ""
+
+cdigit :: String -> Bool
+cdigit [] = True
+cdigit x = if isDigit (head x)
+    then cdigit (tail x)
     else False
 
-toInt :: Char -> Int
-toInt x = digitToInt x
-
-cdigit :: String -> Int -> Bool
-cdigit x 1 = cdigit (tail x) 2
-cdigit x 5 = cdigit (tail x) 6
-cdigit x 11 = cdigit (tail x) 12
-cdigit x 12 = if (isDigit (head x)) || ((head x) == 'X')
-    then True
-    else False
-cdigit [] n = True
-cdigit x n = if isDigit (head x)
-    then cdigit (tail x) (n+1)
-    else False
-
-calsum :: String -> Int -> Int
-calsum x 0 = 0
-calsum [] n = 0
-calsum x n 
-    | n > 11 = ((toInt (head x)) * (n-1)) + (calsum (tail x) (n-1))
-    | n > 5 =  if (n == 11)
-        then calsum (tail x) (n-1)
-        else ((toInt (head x)) * n) + (calsum (tail x) (n-1))
-    | otherwise =  if (n == 1) || (n == 5)
-        then calsum (tail x) (n-1)
-        else ((toInt (head x)) * (n+1)) + (calsum (tail x) (n-1))
+checkmod :: String -> Int -> Int
+checkmod x n
+    |n > 0 = (digitToInt (x!!(10-n)) * n) + checkmod x (n-1)
+    |otherwise = 0
 
 checkisbn :: String -> Bool
-checkisbn x = if (cformat x) && (cdigit x 0)
-    then ((calsum x 12) `mod` 11) == 0
-    else False
+checkisbn x = if (length (cformat x)) == 10
+        then ((checkmod x 10) `mod` 11) == 0
+        else False
 
-main ::IO()
-main = print (checkisbn "1-123012345-1")
+main :: IO()
+main =
+    print (checkisbn "3-598-21508-8")

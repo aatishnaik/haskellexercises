@@ -7,7 +7,9 @@ fibonacci :: Integer -> [Integer]
 fibonacci n = map fibo [1..n]
 
 fibsum :: [Integer] -> Integer
-fibsum [x] = x
+fibsum [x] = if (x `mod` 2) == 0
+    then x
+    else 0
 fibsum xs = if ((head xs) `mod` 2) == 0
     then head xs + fibsum (tail xs)
     else fibsum (tail xs)
@@ -15,11 +17,11 @@ fibsum xs = if ((head xs) `mod` 2) == 0
 --one func for task
 evenfib :: Integer -> Integer -> Integer -> Integer
 evenfib x y ttl 
-    |(x+y) <= 11000 = if (y `mod` 2) == 0
+    |y <= 4000 = if (y `mod` 2) == 0
         then ttl + (evenfib y (x+y) (y+ttl))
         else evenfib y (x+y) ttl
-    | otherwise = 0
+    | y > 13 = 0
 
 main :: IO()
 main =
-    print (fibsum (fibonacci 21))
+    print (fibsum (fibonacci 8))
