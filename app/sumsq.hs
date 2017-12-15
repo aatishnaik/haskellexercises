@@ -1,14 +1,13 @@
-sqr :: Int -> Int
-sqr x = x * x
-sumsq :: Int -> Int
-sumsq n = sqr (sum [1..n])
 
-sqsumcal :: [Int] -> Int
-sqsumcal [] = 0
-sqsumcal x = sqr (head x) + sqsumcal (tail x)
+sumsq :: Int -> Int -> Int
+sumsq n sum
+    | n <= 1000 = sumsq (n+1) (sum+n)
+    | otherwise = sum*sum
+sqsum :: Int -> Int -> Int
+sqsum n sum
+    | n <= 1000 = sqsum (n+1) (sum + (n * n))
+    | otherwise = sum
 
-sqsum :: Int-> Int
-sqsum a = sqsumcal [1..a]
 main :: IO()
 main = do
-    print ((sumsq 100) - (sqsum 100))
+    print ((sumsq 0 0) - (sqsum 0 0))
