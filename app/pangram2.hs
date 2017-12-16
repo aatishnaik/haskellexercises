@@ -2,22 +2,17 @@
 import Data.Char
 import Data.List
 
-getnext :: Char -> String -> Char
-getnext x str = str !! ((head (Data.List.elemIndices x str))+1)
+getnext :: String -> Char
+getnext str = str !! ((head (Data.List.elemIndices (head str) str))+1)
 
 clowercase :: String -> String
 clowercase str = map (toLower) str
 
-checkp :: String -> Char -> Bool
-checkp x 'z' = 'z' `elem` x
-checkp x y = if (y `elem` x)
-    then checkp x (getnext y)
-    else False
-
-cpan c x 
+del "" = ""
+del x = del (delete (head x) ['a'..'z'])
 
 checkpan :: String -> Bool
-checkpan x = checkp (clowercase x) 'a'
+checkpan x = if (del x) == 0
 
 main :: IO()
 main = print (checkpan "Five quacking Zephyrs jolt my wax bed")
