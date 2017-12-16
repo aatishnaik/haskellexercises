@@ -31,4 +31,4 @@ checkisbn x = if (length (cformat x)) == 10
 
 main :: IO()
 main =
-    print (checkisbn "3-598-21508-8")
+    print (checkisbn "3-598021508-8")

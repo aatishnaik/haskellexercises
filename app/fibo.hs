@@ -17,7 +17,7 @@ fibsum xs = if ((head xs) `mod` 2) == 0
 --one func for task
 evenfib :: Integer -> Integer -> Integer -> Integer
 evenfib x y ttl 
-    |y <= 4000 = if (y `mod` 2) == 0
+    |y <= 10000 = if (y `mod` 2) == 0
         then ttl + (evenfib y (x+y) (y+ttl))
         else evenfib y (x+y) ttl
     | y > 13 = 0
