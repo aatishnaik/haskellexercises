@@ -3,7 +3,7 @@ import Data.Char
 import Data.List
 
 getnext :: Char -> Char
-getnext x = ['a'..'z'] !! ((head (Data.List.elemIndices x createmap))+1)
+getnext x = ['a'..'z'] !! ((head (Data.List.elemIndices x ['a'..'z']))+1)
 
 clowercase :: String -> String
 clowercase str = map (toLower) str
