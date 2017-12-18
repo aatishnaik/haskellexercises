@@ -15,13 +15,12 @@ fibsum xs = if ((head xs) `mod` 2) == 0
     else fibsum (tail xs)
 
 --one func for task
-
-efibsum x y ttl
-    |y < 13 = if ((x+y) `mod` 2) == 0
-        then ttl + (efibsum y (x+y) (ttl+x+y))
-        else (efibsum y (x+y) ttl)
-    |y >= 13 = 0
+efibsum n ttl
+    |n > 0 = if ((fibo n) `mod` 2) == 0
+        then ttl + (efibsum (n-1) (ttl+(fibo n)))
+        else (efibsum (n-1) ttl)
+    |n <= 0 = 0
 
 main :: IO()
 main =
-    print (fibsum (fibonacci 8))
+    print (efibsum 20 0)
