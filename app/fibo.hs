@@ -15,12 +15,12 @@ fibsum xs = if ((head xs) `mod` 2) == 0
     else fibsum (tail xs)
 
 --one func for task
-evenfib :: Integer -> Integer -> Integer -> Integer
-evenfib x y ttl 
-    |y <= 10000 = if (y `mod` 2) == 0
-        then ttl + (evenfib y (x+y) (y+ttl))
-        else evenfib y (x+y) ttl
-    | y > 13 = 0
+
+efibsum x y ttl
+    |y < 13 = if ((x+y) `mod` 2) == 0
+        then ttl + (efibsum y (x+y) (ttl+x+y))
+        else (efibsum y (x+y) ttl)
+    |y >= 13 = 0
 
 main :: IO()
 main =
