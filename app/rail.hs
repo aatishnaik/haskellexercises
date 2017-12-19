@@ -1,11 +1,16 @@
 import Data.Char
 import Data.List
 
-keydiff = [-1..10]
-rail :: String -> Int -> Int -> [String]
+diff key = (2 * (key - 1))
 
-
-rail x n i = if i < n
-    then head x
-    else
-        
+indexarr key str = [1,(diff key)+1..(length str)]
+tostr :: Char -> String
+tostr x = [x]
+getstr :: Int -> String -> [Int] -> String
+getstr _ _ [] = ""
+getstr key str index = tostr(str!!((head index)-1)) ++ (getstr key str (tail index))
+rail :: String -> Int -> String
+rail str k = getstr k str (indexarr k str)
+main :: IO()
+main =
+    print (rail "abcdefghijklmnopqrstuv" 2)
