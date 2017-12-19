@@ -8,3 +8,4 @@ rail :: String -> Int -> Int -> [String]
 rail x n i = if i < n
     then head x
     else
+        

@@ -2,9 +2,6 @@
 import Data.Char
 import Data.List
 
-getnext :: Char -> String -> Char
-getnext x y= y !! ((head (Data.List.elemIndices x y))+1)
-
 clowercase :: String -> String
 clowercase str = map (toLower) str
 
