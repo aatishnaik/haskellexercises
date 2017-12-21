@@ -1,7 +1,7 @@
 import Data.List
 import Data.Char
 rmdash :: String -> String
-rmdash x = filter (/='-') x
+rmdash x = delete '-' (delete '-' (delete '-' x))
 
 cformat :: String -> String
 cformat x
