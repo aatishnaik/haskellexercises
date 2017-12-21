@@ -13,8 +13,13 @@ getstr :: Int -> String -> [Int] -> String
 getstr _ _ [] = ""
 getstr key str index = tostr(str!!((head index)-1)) ++ (getstr key str (tail index))
 
+get2str :: Int -> String -> [Int] -> String
+get2str _ _ [] = ""
+gettstr key str index = tostr(str!!((head index)-1)) ++ (getstr key str (tail index))
+
 rail :: String -> Int -> String
 rail str k = getstr k (rmspace str) (indexarr k (rmspace str))
 main :: IO()
 main =
     print (rail "WE ARE DISCOVERED FLEE AT ONCE" 3)
+ 

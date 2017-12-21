@@ -2,8 +2,13 @@
 import Data.Char
 import Data.List
 
+--lc :: String -> Char -> String
+--lc [x] _ = toLower x
+--lc str c = lc (tail str) (toLower (head str))
+
 clowercase :: String -> String
-clowercase str = map (toLower) str
+clowercase [x] = [(toLower x)]
+clowercase str = [(toLower (head str))] ++ clowercase (tail str)
 
 del :: String -> String -> String
 del [x] y = delete x y
