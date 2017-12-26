@@ -8,7 +8,7 @@ checkmul x = if ( x `mod` 3) == 0
     then x
     else 0
 
---check :: Int -> Int -> Int -> Int
+check :: (Int,Int,Int) -> Int
 check (x,n,num) = if ((num `mod` 3) == 0) || ((num `mod` 5) == 0)
     then if x < n
         then check (x+1,n,num+1)
