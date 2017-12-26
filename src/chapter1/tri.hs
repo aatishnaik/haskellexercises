@@ -1,4 +1,5 @@
 --http://exercism.io/exercises/haskell/triangle/readme
+module Chapter1.Tri where
 data Triangle = Triangle { s1 :: Int
                             , s2 :: Int
                             , s3 :: Int

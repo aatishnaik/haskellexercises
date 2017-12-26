@@ -1,3 +1,4 @@
+module Chapter1.Nmultiple where
 checkmul :: Integer -> Integer
 checkmul x = if ( x `mod` 3) == 0
     then x

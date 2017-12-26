@@ -1,4 +1,5 @@
 --http://exercism.io/exercises/haskell/pangram/readme
+module Chapter1.Pangram2 where
 import Data.Char
 import Data.List
 

@@ -1,4 +1,6 @@
 --http://exercism.io/exercises/haskell/bob/readme
+module Chapter1.Bob where
+
 getlast :: [a] -> a
 getlast [x] = x
 getlast (_:xs) = getlast xs

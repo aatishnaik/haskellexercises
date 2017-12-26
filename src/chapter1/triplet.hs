@@ -1,3 +1,4 @@
+module Chapter1.Triplet where
 checklarge :: Int -> Int -> Int -> Bool
 checklarge x y z = if (x > y) && (x > z)
     then checktrip x y z

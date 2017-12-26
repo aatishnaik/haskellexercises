@@ -14,5 +14,5 @@ check (x,n,num) = if ((num `mod` 3) == 0) || ((num `mod` 5) == 0)
         else num
     else check (x,n,num+1)
 
-nmultiple n = map (check (0,5,n) [1..n]
+nmultiple n = map (check (0,5,n)) [1..n]
 --nmultiple n = foldl' (\num a -> check (num,0,a)) 1 [1..n]

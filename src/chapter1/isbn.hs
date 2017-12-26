@@ -1,3 +1,4 @@
+module Chapter1.Isbn where
 import Data.List
 import Data.Char
 rmdash :: String -> String

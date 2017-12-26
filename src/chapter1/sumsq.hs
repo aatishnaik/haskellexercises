@@ -1,4 +1,4 @@
-
+module Chapter1.Sumsq where
 sumsq :: Int -> Int -> Int
 sumsq n sum
     | n <= 1000 = sumsq (n+1) (sum+n)

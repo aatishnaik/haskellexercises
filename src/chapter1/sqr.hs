@@ -1,3 +1,4 @@
+module Chapter1.Square where
 square :: Int -> Int
 square x = x*x
 

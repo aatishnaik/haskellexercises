@@ -1,3 +1,4 @@
+module Chapter1.Fibo where
 fibo :: Integer -> Integer
 fibo 0 = 0
 fibo 1 = 1

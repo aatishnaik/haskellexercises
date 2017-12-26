@@ -1,4 +1,5 @@
 --http://exercism.io/exercises/haskell/rotational-cipher/readme
+module Chapter1.Rotation where
 import Data.Char
 import Data.List
 merge :: [x] -> [x] -> [x]

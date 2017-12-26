@@ -1,3 +1,4 @@
+module Chapter1.Rail3 where
 import Data.Char
 import Data.List
 
