@@ -1,3 +1,4 @@
+module Chapter2.Even where
 import Data.List
 check num = if (num `mod` 2) == 0
     then True
