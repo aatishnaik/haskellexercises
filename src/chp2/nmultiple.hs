@@ -1,5 +1,5 @@
 import Data.List
-check :: ()
+--check :: Int -> Int -> Int -> Int
 check (num,x,n) = if ((num `mod` 3) == 0) || ((num `mod` 5) == 0)
     then if x < n
         then check num+1 x+1 n
