@@ -16,12 +16,12 @@ fibsum xs = if ((head xs) `mod` 2) == 0
     else fibsum (tail xs)
 
 --one func for task
-efibsum :: Integer -> Integer -> Integer -> Integer
-efibsum n1 n2 ttl
-    |n2 < 4000000 = if (n2 `mod` 2) == 0
-        then efibsum n2 (n1+n2) (ttl+n2)
-        else efibsum n2 (n1+n2) ttl
-    |n2 >= 4000000 = ttl
+efibsum :: Integer -> Integer -> Integer -> Integer -> Integer
+efibsum n1 n2 ttl n
+    |n2 < n = if (n2 `mod` 2) == 0
+        then efibsum n2 (n1+n2) (ttl+n2) n
+        else efibsum n2 (n1+n2) ttl n
+    |n2 >= n = ttl
 main :: IO()
 main =
-    print (efibsum 1 1 0)
+    print (efibsum 1 1 0 40000)

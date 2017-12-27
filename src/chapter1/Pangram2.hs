@@ -8,8 +8,8 @@ clowercase [x] = [(toLower x)]
 clowercase str = [(toLower (head str))] ++ clowercase (tail str)
 
 del :: String -> String -> String
-del [x] y = delete x y
-del x y = delete (head x) (del (tail x) y)
+del [c] alphabets = delete c alphabets
+del str alphabets = delete (head str) (del (tail str) alphabets)
 
 checkpan str = if (del (clowercase str) ['a'..'z']) == ""
     then True
