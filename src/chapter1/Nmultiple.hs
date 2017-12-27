@@ -12,5 +12,6 @@ findmul num n s
             then ([num] ++ (findmul (num+1) (n+1) s))
             else (findmul (num+1) n s)
         |otherwise = []
-nmultiple :: Integer -> [Integer]
-nmultiple n = findmul 1 1 n
+
+nmultiple :: Integer -> Integer
+nmultiple n = sum (findmul 1 1 n)
