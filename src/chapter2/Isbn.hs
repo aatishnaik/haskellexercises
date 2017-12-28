@@ -9,7 +9,7 @@ cformat str = if (False `elem` (map (\c -> (isDigit c)) (rmdash str))) || (lengt
     then False
     else True
 
-cmod str = if (cformat str)
+checkisbn str = if (cformat str)
     then if ((foldl' (\val c -> (val+c)) 0 (map (\c -> (digitToInt c)) (rmdash str))) `mod` 11) == 0
         then True
         else False
