@@ -11,6 +11,10 @@ pangram str = if (foldl' (\alphabets c -> delete (toLower c) alphabets) ['a'..'z
 --pangram2 str = if (map (\c -> (filter (/=c) ['a'..'z'])) str) == ""
 --    then True
 --    else False
+pangram2 :: String -> Bool
+pangram2 str = if (foldl' (\test c -> test ++ (filter (==c) ['a'..'z'])) [] (toLow str)) == (filter (/=' ') (toLow str))
+    then True
+    else False
 
 toLow str = map (toLower) str
 
