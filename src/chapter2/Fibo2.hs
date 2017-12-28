@@ -1,2 +1,9 @@
 import Data.List
-fibo n = foldl' (\ (x,y,fiboList) i -> (y,x+y,fiboList ++ [x+y])) (0,1,[]) [1..n]
+
+evenfib n = sum (filter (\c -> c `mod` 2 == 0) (changetype (fibo n)))
+
+changetype :: (Int,Int,[Int]) -> [Int]
+changetype (x,y,z) = z
+
+fibo :: Int -> (Int,Int,[Int])
+fibo n = foldl' (\ (x,y,list) i -> (y,x+y,list ++ [x+y])) (0,1,[]) [1..n]
