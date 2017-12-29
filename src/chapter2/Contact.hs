@@ -2,7 +2,7 @@
 module Contact where
 import Data.Char (toLower)
 import Data.List (foldl')
-    
+
 groupNamesByAlphabet :: Char -> [String] -> (Char, [String])
 groupNamesByAlphabet alpha names =
     foldl' (\ (alphabet, collectedNames) name ->
