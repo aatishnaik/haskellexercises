@@ -7,3 +7,6 @@ changetype (x,y,z) = z
 
 fibo :: Int -> (Int,Int,[Int])
 fibo n = foldl' (\ (x,y,list) i -> (y,x+y,list ++ [x+y])) (0,1,[]) [1..n]
+
+main :: IO()
+main = print(evenfib 10)
