@@ -13,7 +13,7 @@ addnum strlist = add (numlist (length strlist)) strlist
 
 --using foldl'
 --addnum2 :: [String] -> [String]
---addnum2 strlist = foldl' (\ str c -> str ++ c) (numlist (length strlist)) strlist
+addnum2 num strlist = foldl' (\ x c -> x ++ [(show (num)) ++ ":" ++ c]) [] strlist
 
 --using zip
 addnum3 :: [String] -> [(String,String)]
@@ -24,5 +24,5 @@ addnum4 :: [String] -> [String]
 addnum4 strlist = zipWith (++) (numlist (length strlist)) strlist
 
 main :: IO()
-main = print (addnum2 ["abc","bbc","as","sa","ll"])
+main = print (addnum2 1 ["abc","bbc","as","sa","ll"])
 --main = print (numlist 20)
