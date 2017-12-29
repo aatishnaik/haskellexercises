@@ -1,4 +1,4 @@
-module LineNumbers where
+module Chapter2.LineNumbers where
 import Data.Char
 import Data.List
 

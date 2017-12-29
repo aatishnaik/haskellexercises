@@ -1,5 +1,5 @@
 
-module Contact where
+module Chapter2.Contact where
 import Data.Char (toLower)
 import Data.List (foldl')
 
