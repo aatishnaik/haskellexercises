@@ -14,3 +14,6 @@ checkisbn str = if (cformat str)
         then True
         else False
     else False
+
+--using zip
+
