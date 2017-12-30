@@ -11,9 +11,11 @@ add numlist strlist = [(head numlist ++ head strlist)] ++ add (tail numlist) (ta
 addnum :: [String] -> [String]
 addnum strlist = add (numlist (length strlist)) strlist
 
+getx (x,y)=x
+gety (x,y)=y
 --using foldl'
 --addnum2 :: [String] -> [String]
-addnum2 num strlist = foldl' (\ x c -> x ++ [(show (num)) ++ ":" ++ c]) [] strlist
+addnum2 strlist = foldl' (\ x -> (getx x) ++ (gety x)) [] [((numlist (length strlist)),strlist)]
 
 --using zip
 addnum3 :: [String] -> [(String,String)]
