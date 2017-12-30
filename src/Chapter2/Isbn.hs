@@ -14,3 +14,9 @@ checkisbn str = if (cformat str)
     else False
 
 --using zip
+checkisbn2 str = if (cformat str)
+    then if ((sum (zipWith (*) [1..10] (map (\c -> (digitToInt c)) (rmdash str)))) `mod` 11) == 0
+        then True
+
+        else False
+    else False
