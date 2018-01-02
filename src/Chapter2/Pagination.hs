@@ -9,11 +9,11 @@ totalPage ti ip = if (ti `mod` ip == 0)
 getString :: Int -> Int -> Int -> String
 getString fp lp cp = (foldl (\ str x -> str ++" "++ (show x)) "<<Prev" [fp..cp]) ++ (foldl (\ str x -> str ++" "++ (show x)) "*" [(cp+1)..lp])
 
---type ItemsPerPage = Int
---type TotalItems = Int
---type CurrentPage = Int
---displayPagination :: TotalItems -> ItemsPerPage -> CurrentPage -> String
-displayPagination :: Int -> Int -> Int -> String
+type ItemsPerPage = Int
+type TotalItems = Int
+type CurrentPage = Int
+displayPagination :: TotalItems -> ItemsPerPage -> CurrentPage -> String
+--displayPagination :: Int -> Int -> Int -> String
 displayPagination ti ip cp = if (totalPage ti ip) >= 8
     then (getString (cp-3) (cp+3) cp )++" Next>>"
     else (getString 1 (totalPage ti ip) cp)++" Next>>"
