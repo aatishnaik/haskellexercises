@@ -1,6 +1,7 @@
 import Data.List
-
-evenfib n = sum (filter (\c -> c `mod` 2 == 0) (changetype (fibo n)))
+evenfib :: Int -> Int
+evenfib n = let ch = changetype (fibo n)
+    in sum (filter (\c -> c `mod` 2 == 0) ch)
 
 changetype :: (Int,Int,[Int]) -> [Int]
 changetype (x,y,z) = z
