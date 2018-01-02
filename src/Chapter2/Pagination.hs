@@ -7,7 +7,7 @@ totalPage ti ip = if (ti `mod` ip == 0)
     then (ti `div` ip)
     else (ti `div` ip)+1
 getString :: Int -> Int -> Int -> String
-getString fp lp cp = (foldl (\ str x -> str ++" "++ (show x)) "<<Prev" [fp..cp]) ++ (foldl (\ str x -> str ++" "++ (show x)) "*" [(cp+1)..lp])
+getString fp lp cp = (foldl' (\ str x -> str ++" "++ (show x)) "<<Prev" [fp..cp]) ++ (foldl' (\ str x -> str ++" "++ (show x)) "*" [(cp+1)..lp])
 
 type ItemsPerPage = Int
 type TotalItems = Int
