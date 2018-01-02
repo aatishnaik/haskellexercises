@@ -12,3 +12,6 @@ groupNamesByAlphabet alpha names =
     
 groupNamesByAllAlphabets :: [String] -> [(Char, [String])]
 groupNamesByAllAlphabets names = map (\alphabet -> groupNamesByAlphabet alphabet names) ['a'..'z']
+
+main :: IO()
+main = print (groupNamesByAllAlphabets ["abc","bbc"])
