@@ -23,4 +23,4 @@ displayPagination ti ip cp = if (totalPage ti ip) >= 8
     else (getString 1 (totalPage ti ip) cp)++" Next>>"
 
 main :: IO()
-main = print (displayPagination 100 3 8)
+main = print (displayPagination 10 3 3)
