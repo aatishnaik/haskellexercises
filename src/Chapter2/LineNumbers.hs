@@ -1,30 +1,30 @@
 module Chapter2.LineNumbers where
 import Data.Char
 import Data.List
-
-numlist n = map (\i -> (show i)++":") [1..n]
+numList :: Int -> [String]
+numList n = (map (\i -> (show i)++": ") [1..n])
 
 --using recursion
 add :: [String] -> [String] -> [String]
 add [n] [x] = [n++x]
 add numlist strlist = [(head numlist ++ head strlist)] ++ add (tail numlist) (tail strlist)
-addnum :: [String] -> [String]
-addnum strlist = add (numlist (length strlist)) strlist
+prefixLineNumbers :: [String] -> [String]
+prefixLineNumbers strlist = add ((map (\i -> (show i)++": ") [1..(length strlist)])) strlist
 
 getx (x,y)=x
 gety (x,y)=y
 --using foldl'
---addnum2 :: [String] -> [String]
-addnum2 strlist = foldl' (\ x -> (getx x) ++ (gety x)) [] [((numlist (length strlist)),strlist)]
+--prefixLineNumbers2 :: [String] -> [String]
+prefixLineNumbers2 strlist = foldl' (\ y x -> y ++ (getx x) ++ (gety x)) [] (intersperse [(numList (length strlist),strlist)])
 
 --using zip
-addnum3 :: [String] -> [(String,String)]
-addnum3 strlist = zip (numlist (length strlist)) (strlist)
+prefixLineNumbers3 :: [String] -> [String]
+prefixLineNumbers3 strlist = map (\(num,str) -> num++str) (zip (map (\i -> (show i)++": ") [1..(length strlist)]) (strlist))
 
 --using zipWith
-addnum4 :: [String] -> [String]
-addnum4 strlist = zipWith (++) (numlist (length strlist)) strlist
+prefixLineNumbers4 :: [String] -> [String]
+prefixLineNumbers4 strlist = zipWith (\ x y -> x ++ y) (map (\i -> (show i)++": ") [1..(length strlist)]) strlist
 
 main :: IO()
-main = print (addnum2 1 ["abc","bbc","as","sa","ll"])
+main = print (prefixLineNumbers2 ["abc","bbc","as","sa",""])
 --main = print (numlist 20)
