@@ -1,8 +1,6 @@
 module Chapter2.LineNumbers where
 import Data.Char
 import Data.List
-numList :: Int -> [String]
-numList n = (map (\i -> (show i)++": ") [1..n])
 
 --using recursion
 add :: [String] -> [String] -> [String]
