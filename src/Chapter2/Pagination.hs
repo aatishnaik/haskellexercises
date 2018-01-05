@@ -13,13 +13,14 @@ type ItemsPerPage = Int
 type TotalItems = Int
 type CurrentPage = Int
 displayPagination :: TotalItems -> ItemsPerPage -> CurrentPage -> String
-displayPagination ti ip cp = if (totalPage ti ip) >= 8
-    then if (((totalPage ti ip) - cp) > 3) && (cp > 3)
-        then (getString (cp-3) (cp+3) cp )++" |...| Next>>"
-        else if (cp <= 3)
-            then (getString 1 7 cp )++" |...| Next>>"
-        else (getString ((totalPage ti ip) - 7) (totalPage ti ip) cp )++" | Next>>"
-    else (getString 1 (totalPage ti ip) cp)++" | Next>>"
+displayPagination ti ip cp = let tp = totalPage ti ip
+    in if tp >= 8
+        then if ((tp - cp) > 3) && (cp > 3)
+            then (getString (cp-3) (cp+3) cp )++" |...| Next>>"
+            else if (cp <= 3)
+                then (getString 1 7 cp )++" |...| Next>>"
+            else (getString (tp - 7) tp cp )++" | Next>>"
+        else (getString 1 tp cp)++" | Next>>"
 
 main :: IO()
 main = print (displayPagination 100 3 30)
