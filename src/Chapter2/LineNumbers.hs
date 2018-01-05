@@ -11,11 +11,9 @@ add numlist strlist = [(head numlist ++ head strlist)] ++ add (tail numlist) (ta
 prefixLineNumbers :: [String] -> [String]
 prefixLineNumbers strlist = add ((map (\i -> (show i)++": ") [1..(length strlist)])) strlist
 
-getx (x,y)=x
-gety (x,y)=y
 --using foldl'
 --prefixLineNumbers2 :: [String] -> [String]
-prefixLineNumbers2 strlist = foldl' (\ y x -> y ++ (getx x) ++ (gety x)) [] (intersperse [(numList (length strlist),strlist)])
+prefixLineNumbers2 strlist = lines (foldl' (\str line -> str ++ [(intToDigit (head (elemIndices line strlist)))] ++ ": "++ line ++ "\n") [] strlist)
 
 --using zip
 prefixLineNumbers3 :: [String] -> [String]
