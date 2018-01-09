@@ -2,8 +2,11 @@ module Chapter2.GenFibo where
 import Data.Char
 import Data.List
 
-genFibo :: (Int -> Bool) -> [Int]
-getFibo con = _todo
+--genFibo :: Int -> Int -> [Int]
+getFibo x n
+    |x==2 = neven n
+    |x==3 = ntri n
+    |otherwise = [0]
 
 getarr :: (Int,Int,[Int]) -> [Int ]
 getarr (n1,n2,arr) = arr
@@ -18,4 +21,4 @@ ntri :: Int -> [Int]
 ntri n = take n (filter (\n->((n `mod` 3) == 0)) (getarr (fibo n)))
 
 main :: IO()
-main = print ""
+main = print (getFibo 3 10)
