@@ -63,7 +63,7 @@ module Chapter2.ExamScore2 where
         let newmksheet = allValidSubjects mksheet subjects
          in filter (\x -> not ((fst x) `elem` (duplicateNames newmksheet))) newmksheet
     
-    calculateSd :: MarkSheet -> [SubjectName] -> SubjectName -> Int
+    calculateSd :: MarkSheet -> [SubjectName] -> SubjectName -> Float 
     calculateSd mksheet subjects subname =
         let avg = subAvg mksheet subjects subname
             subScores = map (\x -> snd x) (allValidSubjects mksheet subjects)
@@ -71,4 +71,4 @@ module Chapter2.ExamScore2 where
             mksArr = map (\x -> (snd x)-avg) (concat subarr)
             squareArr = map (\x -> (x*x)) mksArr
             variance = (sum squareArr) `div` (length squareArr)
-        in variance
+        in sqrt (fromIntegral variance)
