@@ -23,4 +23,4 @@ ntri :: Int -> [Int]
 ntri n = take n (filter (\n->((n `mod` 3) == 0)) (getarr (fibo n)))
 
 main :: IO()
-main = print (genFibo 2 10)
+main = print (genFibo 2 5)
