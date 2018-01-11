@@ -37,11 +37,11 @@ module Chapter2.ExamScore2 where
             list = filter (\ (namesub,markssub,flag,msg) -> (filterFn == flag)) validSubs
         in map (\ (namesub,markssub,flag,msg) -> (namesub,markssub,msg)) list
     
-    allInvalidSubjects :: MarkSheet -> [SubjectName] -> MarkSheet
+    allInvalidSubjects :: MarkSheet -> [SubjectName] -> [(StudentName,[(SubjectName,SubjectMarks,String)])]
     allInvalidSubjects markSheet subjects =
         let invalidNames = map (\x -> (fst x,(filterSubjects False markSheet subjects (fst x)))) markSheet
-        in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) invalidNames
-    
+        in invalidNames
+
     allValidSubjects markSheet subjects =
         let validNames = map (\x -> (fst x,(filterSubjects True markSheet subjects (fst x)))) markSheet
         in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) validNames
@@ -72,3 +72,18 @@ module Chapter2.ExamScore2 where
             squareArr = map (\x -> (x*x)) mksArr
             variance = (sum squareArr) `div` (length squareArr)
         in sqrt (fromIntegral variance)
+{--  
+    allSubjectsInExam :: MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
+    allSubjectsInExam mksheet subjects = 
+
+
+
+
+      
+        let subjectsInExam = foldl' (\arr x -> arr ++ snd x) [] (filter (\x -> (fst x)==studname) (allValidNames mksheet subjects))
+            studentInExam = (filter (\x -> (fst x)==subname) (subjectInExam mksheet subjects studname)) /= []
+            allStudentsInExam = foldl' (\(subname,sub) x ->
+                if (studentInExam mksheet subjects (fst x) subname)
+                    then (subname, sub ++ [fst x])
+                else  (subname, sub)) (subname,[]) (allValidNames mksheet subjects)
+        in map (\x -> [(allStudentsInExam mksheet subjects x)]) subjects-}
