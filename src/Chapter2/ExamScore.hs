@@ -84,13 +84,13 @@ module Chapter2.ExamScore2 where
                 ) [] newlist) )) subjects
         in arr
     
-    subjectsInExam :: MarkSheet -> [SubjectName] -> [([SubjectName],[StudentName])]
+    --subjectsInExam :: MarkSheet -> [SubjectName] -> [([SubjectName],[StudentName])]
     subjectsInExam  mksheet subjects =
-        let list = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
-            sequencesubj = subsequences subjects
-            newlist = foldl' (\arr (namestud,scorelist) -> 
-                if (scorelist `elem` sequencesubj) 
-                    then arr++[(scorelist,[namestud])]
-                    else arr
-                ) [] list
-        in newlist
+        let namelist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
+            sublist = studentsInSubject mksheet subjects
+            newname = delete [] (nub (map (\(x,y) -> y) namelist))
+            newsub =  delete [] (nub (map (\(x,y) -> y) sublist))
+            emptyele = filter (\(x,y)-> y == []) sublist
+            emptylist = map (\(x,y) -> ([x],y)) emptyele
+            newlist = zip newname newsub
+        in newlist ++ emptylist
