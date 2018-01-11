@@ -7,14 +7,14 @@ module Chapter2.ExamScore2 where
     type SubjectMarks = Int
     type MarkSheet = [(String,[(String,Int)])]
     
-    subAvg :: MarkSheet -> [SubjectName] -> SubjectName -> Int
+    subAvg :: MarkSheet -> [SubjectName] -> SubjectName -> Float
     subAvg markSheet subjects subjname =
         let validSubs = allValidNames markSheet subjects
             subs = map (\x -> (snd x)) validSubs
             subarr = map (\x -> (filter (\(namesub,markssub) -> namesub == subjname) x )) subs
             scoresarr = concat subarr
             scores = map (\(namesub,markssub) -> markssub) scoresarr
-        in (sum scores) `div` (length scores)
+        in fromIntegral (sum scores) / fromIntegral (length scores)
     
     filterNames :: ([StudentName] -> Bool) -> MarkSheet -> [StudentName]
     filterNames filterFn markSheet =
@@ -69,10 +69,10 @@ module Chapter2.ExamScore2 where
         let avg = subAvg mksheet subjects subname
             subScores = map (\x -> snd x) (allValidSubjects mksheet subjects)
             subarr = map (\x -> (filter (\(namesub,markssub) -> namesub == subname) x )) subScores
-            mksArr = map (\x -> (snd x)-avg) (concat subarr)
+            mksArr = map (\x -> (fromIntegral(snd x))-avg) (concat subarr)
             squareArr = map (\x -> (x*x)) mksArr
-            variance = (sum squareArr) `div` (length squareArr)
-        in sqrt (fromIntegral variance)
+            variance = (sum squareArr) / fromIntegral (length squareArr)
+        in sqrt variance
 
     studentsInSubject :: MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
     studentsInSubject mksheet subjects =
