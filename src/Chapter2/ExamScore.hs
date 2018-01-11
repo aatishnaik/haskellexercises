@@ -84,7 +84,7 @@ module Chapter2.ExamScore2 where
                 ) [] newlist) )) subjects
         in arr
     
-    --subjectsInExam :: MarkSheet -> [SubjectName] -> [([SubjectName],[StudentName])]
+    subjectsInExam :: MarkSheet -> [SubjectName] -> [([SubjectName],[StudentName])]
     subjectsInExam  mksheet subjects =
         let namelist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
             sublist = studentsInSubject mksheet subjects
