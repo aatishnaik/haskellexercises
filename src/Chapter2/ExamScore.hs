@@ -42,6 +42,7 @@ module Chapter2.ExamScore2 where
         let invalidNames = map (\x -> (fst x,(filterSubjects False markSheet subjects (fst x)))) markSheet
         in invalidNames
 
+    allValidSubjects :: MarkSheet -> [SubjectName] -> MarkSheet
     allValidSubjects markSheet subjects =
         let validNames = map (\x -> (fst x,(filterSubjects True markSheet subjects (fst x)))) markSheet
         in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) validNames
@@ -83,6 +84,13 @@ module Chapter2.ExamScore2 where
                 ) [] newlist) )) subjects
         in arr
     
+    subjectsInExam :: MarkSheet -> [SubjectName] -> [([SubjectName],[StudentName])]
     subjectsInExam  mksheet subjects =
-        let newlist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
+        let list = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
+            sequencesubj = subsequences subjects
+            newlist = foldl' (\arr (namestud,scorelist) -> 
+                if (scorelist `elem` sequencesubj) 
+                    then arr++[(scorelist,[namestud])]
+                    else arr
+                ) [] list
         in newlist
