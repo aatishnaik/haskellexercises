@@ -72,18 +72,17 @@ module Chapter2.ExamScore2 where
             squareArr = map (\x -> (x*x)) mksArr
             variance = (sum squareArr) `div` (length squareArr)
         in sqrt (fromIntegral variance)
-{--  
-    allSubjectsInExam :: MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
-    allSubjectsInExam mksheet subjects = 
 
-
-
-
-      
-        let subjectsInExam = foldl' (\arr x -> arr ++ snd x) [] (filter (\x -> (fst x)==studname) (allValidNames mksheet subjects))
-            studentInExam = (filter (\x -> (fst x)==subname) (subjectInExam mksheet subjects studname)) /= []
-            allStudentsInExam = foldl' (\(subname,sub) x ->
-                if (studentInExam mksheet subjects (fst x) subname)
-                    then (subname, sub ++ [fst x])
-                else  (subname, sub)) (subname,[]) (allValidNames mksheet subjects)
-        in map (\x -> [(allStudentsInExam mksheet subjects x)]) subjects-}
+    studentsInSubject :: MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
+    studentsInSubject mksheet subjects =
+        let newlist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
+            arr = map (\s -> (s,(foldl' (\arr (namestud,namesub) -> 
+                if (s `elem` namesub)
+                    then arr ++ [namestud]
+                    else arr
+                ) [] newlist) )) subjects
+        in arr
+    
+    subjectsInExam  mksheet subjects =
+        let newlist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) (allValidNames mksheet subjects)
+        in newlist
