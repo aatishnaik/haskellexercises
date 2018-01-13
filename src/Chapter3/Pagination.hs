@@ -20,5 +20,3 @@ displayPagination ip ti cp np =
             then show([(cp+1)..totalPage])++ " Next >>"
         else show([(cp+1)..(cp+4)])++ "... Next >>"
     }
-main :: IO()
-main = print (displayPagination 9 100 3 4)

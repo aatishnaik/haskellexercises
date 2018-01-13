@@ -9,12 +9,14 @@ data Date = MkDate {
 } deriving (Eq, Show, Ord)
 
 add :: Date -> Int -> Date
-add (MkDate {day = d, month = m, year = y}) dys = MkDate
+add (MkDate {day = d, month = m, year = y}) dys = 
+    let tdays = d+dys
+    in MkDate
     {
         day = if (d+dys) < 30 then (d+dys) else (d+dys `mod` 30),
         month = 
-            if ((d+dys) > 30) && (month + ((d+dy) `div` 30)) < 12 then month + ((d+dy)`div`30)
-            else  if ((d+dys) > 30) && (month + ((d+dy)`div`30)) > 12 then ((month + ((d+dy)`div`30)) `mod` 12)
+            if (tdays > 30) && (month + (tdays `div` 30)) < 12 then month + (tdays `div`30)
+            else  if ((d+dys) > 30) && (month + (tdays `div`30)) > 12 then ((month + (tdays `div`30)) `mod` 12)
             else month,
         year = y
     }
