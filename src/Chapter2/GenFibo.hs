@@ -18,4 +18,4 @@ ntri :: Int -> [Int]
 ntri n = genFibo (\x -> (x `mod` 3) == 0) n
 
 main :: IO()
-main = print (neven 10)
+main = print (ntri 10)

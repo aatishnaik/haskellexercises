@@ -9,7 +9,6 @@ genFibo fn n1 n2 ttl n s
         else genFibo fn n2 (n1+n2) ttl n s
     |n>=s = ttl
 
-
 neven :: Int -> [Int]
 neven n = genFibo (\x -> (x `mod` 2) == 0) 0 1 [] 0 n
 
