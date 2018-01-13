@@ -8,6 +8,7 @@ data Rail = MkRail{
     rail3 :: String
 }deriving Show
 
+railfence :: String -> Rail
 railfence str =
     MkRail{
         rail1=skipchar (rmspace str) 0 3,
@@ -15,10 +16,12 @@ railfence str =
         rail3=skipchar (rmspace str) 2 3
     }
 
+skipchar :: String -> Int -> Int -> String
 skipchar str x n
     |((length str) > x) = [str!!x] ++ (skipchar str (x+n+1) n)
     |otherwise = ""
 
+rmspace :: String -> String
 rmspace str = if (length (delete ' ' str)) < (length str) 
     then rmspace (delete ' ' str)
     else delete ' ' str
