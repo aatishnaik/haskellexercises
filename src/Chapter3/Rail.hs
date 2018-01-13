@@ -25,5 +25,3 @@ rmspace :: String -> String
 rmspace str = if (length (delete ' ' str)) < (length str) 
     then rmspace (delete ' ' str)
     else delete ' ' str
-main :: IO()
-main = print (railfence "WE ARE DISCOVERED FLEE AT ONCE")
