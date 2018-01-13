@@ -1,0 +1,20 @@
+module Chapter3.Date where
+import Data.List
+import Data.Char
+
+data Date = MkDate {
+  day :: Int
+, month :: Int
+, year :: Int
+} deriving (Eq, Show, Ord)
+
+add :: Date -> Int -> Date
+add (MkDate {day = d, month = m, year = y}) dys = MkDate
+    {
+        day = if (d+dys) < 30 then (d+dys) else (d+dys `mod` 30),
+        month = 
+            if ((d+dys) > 30) && (month + ((d+dy) `div` 30)) < 12 then month + ((d+dy)`div`30)
+            else  if ((d+dys) > 30) && (month + ((d+dy)`div`30)) > 12 then ((month + ((d+dy)`div`30)) `mod` 12)
+            else month,
+        year = y
+    }
