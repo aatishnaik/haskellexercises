@@ -1,32 +1,13 @@
-module Chapter3.ExamScore where
+module Chapter3.ExamScore2 where
 import Data.Char
 import Data.List
-
-{-data Marksheet = MkMarksheet {
-    studentName :: String,
-    scoreList :: [(String,Int)]
-}-}
-type StudentName = String
-type SubjectName = String
-type SubjectMarks = Int
-type MarkSheet = [(String,[(String,Int)])]
-
-data ScoreList = MkScoreList {
-    subjectName :: String,
-    subjectMarks :: Int
-}
-type StudentName = String
-type SubjectName = String
-type SubjectMarks = Int
-type MarkSheet = [(StudentName,[ScoreList])]
---subAvg :: [Marksheet] -> [String] -> String -> Float
---subAvg [MkMarksheet {studenntName = sName,scoreList = sList}] subjects subname = 1.2
-
+        
+data StudentName = MkStudentName String deriving Show
+data SubjectName = MkSSubjectName String deriving Show
+data SubjectMarks = MkSubjectMarks Int deriving Show
+data MarkSheet = [(StudentName,[(SubjectName,SubjectMarks)])]
+    
 --subAvg :: MarkSheet -> [SubjectName] -> SubjectName -> Float
-subAvg markSheet subjects subjname =
-    let validSubs = markSheet{-allValidNames-} -- subjects
-        subs = map (\x -> (snd x)) validSubs
-        subarr = map (\x -> (filter (\(namesub,markssub) -> namesub == subjname) x )) subs
-        scoresarr = concat subarr
-        scores = map (\(namesub,markssub) -> markssub) scoresarr
-    in fromIntegral (sum scores) / fromIntegral (length scores)
+subAvg mksheet subjects subname =
+    let [(sname,score)] = mksheet
+    in sname
