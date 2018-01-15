@@ -16,7 +16,10 @@ add (MkDate {day = d, month = m, year = y}) dys =
         day = if (d+dys) < 30 then (d+dys) else (d+dys `mod` 30),
         month = 
             if (tdays > 30) && (month + (tdays `div` 30)) < 12 then month + (tdays `div`30)
-            else  if ((d+dys) > 30) && (month + (tdays `div`30)) > 12 then ((month + (tdays `div`30)) `mod` 12)
+            else if ((d+dys) > 30) && (month + (tdays `div`30)) > 12 
+                then ((month + (tdays `div`30)) `mod` 12)
             else month,
-        year = y
+        year = if (month + (tdays `div`30)) > 12 
+            then y+(month + (tdays `div`30) `mod` 12)
+            else year
     }
