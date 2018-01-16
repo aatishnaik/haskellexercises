@@ -5,7 +5,7 @@ import Data.List
 data StudentName = MkStudentName String deriving Show
 data SubjectName = MkSSubjectName String deriving Show
 data SubjectMarks = MkSubjectMarks Int deriving Show
-data MarkSheet = [(StudentName,[(SubjectName,SubjectMarks)])]
+data MarkSheet = MkMarksheet [(StudentName,[(SubjectName,SubjectMarks)])] deriving Show
     
 --subAvg :: MarkSheet -> [SubjectName] -> SubjectName -> Float
 subAvg mksheet subjects subname =
