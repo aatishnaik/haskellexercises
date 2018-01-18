@@ -2,6 +2,7 @@ module Chapter3.Rail where
 import Data.Char
 import Data.List
 
+--this approach is better and much faster than the 2nd one
 data Rail = MkRail{
     rail1 :: String,
     rail2 :: String,
