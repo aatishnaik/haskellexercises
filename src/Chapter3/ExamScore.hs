@@ -6,7 +6,6 @@ data StudentName = MkStudentName String deriving Show
 data SubjectName = MkSubjectName String deriving Show
 data SubjectMarks = MkSubjectMarks Int deriving Show
 data SubjectArr= MkSubjectArr [SubjectName] deriving Show
-data StudentArr= MkStudentArr [StudentName] deriving Show
 data MarkSheet = MkMarkSheet [(StudentName,[(SubjectName,SubjectMarks)])] deriving Show
 
 subAvg :: MarkSheet -> SubjectArr -> SubjectName -> Float
