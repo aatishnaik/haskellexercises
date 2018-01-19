@@ -9,15 +9,15 @@ data Year = MkYear Int deriving Show
 
 addDays :: (Day, Month, Year) -> Int -> (Day, Month, Year)
 addDays (MkDay day,MkMonth month,MkYear year) dys =
-    let tdays = day+dys
+    let totaldays = day+dys
         monthlist = if (year `mod` 4) == 0 then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
-        xday = tdays `div` 30
+        xtraday = totaldays `div` 30
         in(
-            if tdays <= (monthlist!!month) then MkDay tdays else MkDay (tdays `mod` 30),
-            if (tdays > (monthlist!!month)) && ((month + xday) <= 12) then MkMonth (month + xday)
-                else if ((day+dys) > 30) && ((month + xday) > 12)
-                    then MkMonth ((month + xday) `mod` 12)
+            if totaldays <= (monthlist!!month) then MkDay totaldays else MkDay (totaldays `mod` 30),
+            if (totaldays > (monthlist!!month)) && ((month + xtraday) <= 12) then MkMonth (month + xtraday)
+                else if ((day+dys) > 30) && ((month + xtraday) > 12)
+                    then MkMonth ((month + xtraday) `mod` 12)
                 else MkMonth month,
-            if (month + (tdays `div` 30)) > 12 
-                then MkYear (year+((month + xday) `mod` 12))
+            if (month + (totaldays `div` 30)) > 12
+                then MkYear (year+((month + xtraday) `mod` 12))
                 else MkYear year)

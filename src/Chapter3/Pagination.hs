@@ -9,14 +9,14 @@ data Pages = MkPage {
 }deriving Show
 
 displayPagination :: Int -> Int -> Int -> Int -> Pages
-displayPagination ip ti cp np =
-    let totalPage = if (ti `mod` ip == 0) then (ti `div` ip) else (ti `div` ip)+1
-    in MkPage { 
-        prev = if (cp > 4)
-            then "<< Prev ... "++ show([(cp-4)..(cp-1)])
-        else "<< Prev "++ show([1..(cp-1)]),
-        current = (show (cp))++"*",
-        next = if ((cp+4) > totalPage)
-            then show([(cp+1)..totalPage])++ " Next >>"
-        else show([(cp+1)..(cp+4)])++ "... Next >>"
+displayPagination initialPg totalItems currentPg numberOfPages =
+    let totalPage = if (totalItems `mod` initialPg == 0) then (totalItems `div` initialPg) else (totalItems `div` initialPg)+1
+    in MkPage {
+        prev = if (currentPg > 4)
+            then "<< Prev ... "++ show([(currentPg-4)..(currentPg-1)])
+        else "<< Prev "++ show([1..(currentPg-1)]),
+        current = (show (currentPg))++"*",
+        next = if ((currentPg+4) > totalPage)
+            then show([(currentPg+1)..totalPage])++ " Next >>"
+        else show([(currentPg+1)..(currentPg+4)])++ "... Next >>"
     }
