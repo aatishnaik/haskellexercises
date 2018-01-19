@@ -23,7 +23,7 @@ pagination initialPg totalItems currentPg numberOfPages =
                 else [(currentPg+1)..(currentPg+4)]
     }
 
---displayPagination :: Int -> Int -> Int -> Int -> String
+displayPagination :: Int -> Int -> Int -> Int -> String
 displayPagination initialPg totalItems currentPg numberOfPages =
             let pages = (pagination initialPg totalItems currentPg numberOfPages)
                 totalPage = if (totalItems `mod` initialPg == 0) then (totalItems `div` initialPg) else (totalItems `div` initialPg)+1

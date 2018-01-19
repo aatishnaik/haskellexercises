@@ -18,7 +18,6 @@ subAvg (MkMarkSheet mksheet) (MkSubjectArr subjects) (MkSubjectName subname) =
         tarr = map (\(MkSubjectMarks x)-> x) scores
     in fromIntegral (sum tarr) / fromIntegral(length tarr)
 
-
 filterSubjects :: Bool -> MarkSheet -> SubjectArr -> StudentName -> [(SubjectName,SubjectMarks,String)]
 filterSubjects filterFn (MkMarkSheet markSheet) (MkSubjectArr subjects) (MkStudentName studName) = 
     let subs = filter (\ (MkStudentName studentName, scoreList) -> studentName == studName) markSheet
@@ -37,7 +36,6 @@ allValidSubjects (MkMarkSheet markSheet) (MkSubjectArr subjects) =
     let validNames = map (\x -> (fst x,(filterSubjects True (MkMarkSheet markSheet) (MkSubjectArr subjects) (fst x)))) markSheet
     in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) validNames
 
-
 checkScore :: MarkSheet -> SubjectArr -> StudentName -> SubjectName -> (SubjectName,SubjectMarks,Bool,String)
 checkScore (MkMarkSheet mksheet) (MkSubjectArr subjects) (MkStudentName studname) (MkSubjectName subname) =  
     let subOfStudent = snd (head (filter (\((MkStudentName x),y) -> x == studname) mksheet))
@@ -51,7 +49,6 @@ checkScore (MkMarkSheet mksheet) (MkSubjectArr subjects) (MkStudentName studname
         else if not (subname `elem` subarr)
         then (MkSubjectName subname,MkSubjectMarks mark,False,"invalid subject name")
         else (MkSubjectName subname,MkSubjectMarks mark,True,"Valid")
-
 
 filterNames :: ([String] -> Bool) -> MarkSheet -> [StudentName]
 filterNames filterFn (MkMarkSheet markSheet) =
@@ -104,4 +101,3 @@ subjectsInExam  (MkMarkSheet mksheet) (MkSubjectArr subjects) =
         emptylist = map (\(x,y) -> ([x],y)) emptyele
         newlist = zip newname newsub
     in newlist ++ emptylist
-
