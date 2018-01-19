@@ -6,6 +6,7 @@ addDays :: (Int, Int, Int) -> Int -> (Int, Int, Int)
 addDays (day,month,year) dys = 
     let tdays = day+dys
         monthlist = if (year `mod` 4) == 0 then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
+        avg = fromIntegral (sum monthlist) / 12
     in(
         if tdays <= (monthlist!!(month-1)) then tdays else (tdays `mod` 30)+1,
         if (tdays > (monthlist!!(month-1))) && ((month + (tdays `div` 30)) <= 12) 
