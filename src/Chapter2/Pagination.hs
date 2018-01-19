@@ -39,4 +39,4 @@ displayPagination2 np ti ip cp = let tp = if (ti `mod` ip == 0) then (ti `div` i
                                             else "<<Prev "++(getString 1 tp cp)++" | Next>>"
 
 main :: IO()
-main = print (displayPagination2 9 100 3 4)
+main = print (displayPagination2 9 100 4 10)
