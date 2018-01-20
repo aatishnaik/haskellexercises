@@ -13,17 +13,20 @@ addDays date dys =
     let
         totaldays = (getDay date)+dys
         monthlist = if ((getYear date) `mod` 4) == 0 then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
-        xtraday = totaldays `div` 30
+        marr = [month..((month + (totaldays `div` 30)))]
+        msum = sum (map (\x->(monthlist!!(x-1))) marr)
+        avg = (fromIntegral msum) `div` (fromIntegral (length marr))
+        xtraday = totaldays `div` avg
     in MkDate
     {
-        day = if totaldays <= (monthlist!!(getMonth date)) then totaldays else (totaldays `mod` 30),
+        day = if totaldays <= (monthlist!!(getMonth date)) then totaldays else (totaldays `mod` avf),
         month =
             if (totaldays > (monthlist!!(getMonth date))) && ((getMonth date + xtraday) <= 12) then (getMonth date + xtraday)
-            else if (((getDay date)+dys) > 30) && (((getMonth date) + xtraday) > 12)
+            else if (((getDay date)+dys) > avg) && (((getMonth date) + xtraday) > 12)
                 then ((getMonth date) + xtraday) `mod` 12
             else (getMonth date),
-        year = if ((getMonth date)+ (totaldays `div` 30)) > 12
-            then (getYear date)+((getMonth date) + (totaldays `div`30) `div` 12)
+        year = if ((getMonth date)+ (totaldays `div` avg)) > 12
+            then (getYear date)+((getMonth date) + (totaldays `div` avg) `div` 12)
             else (getYear date)
     }
 
