@@ -2,10 +2,9 @@ module Chapter3.DateAdd2 where
 import Data.List
 import Data.Char
 
-data Day = MkDay Int deriving Show
-data Month = MkMonth Int deriving Show
-data Year = MkYear Int deriving Show
-
+data Day = MkDay Int deriving (Eq, Show, Ord)
+data Month = MkMonth Int deriving (Eq, Show, Ord)
+data Year = MkYear Int deriving (Eq, Show, Ord)
 
 addDays :: (Day, Month, Year) -> Int -> (Day, Month, Year)
 addDays (MkDay day,MkMonth month,MkYear year) dys =

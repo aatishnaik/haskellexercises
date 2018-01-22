@@ -1,8 +1,7 @@
 module Chapter3.DateAdd3 where
 import Data.List
 import Data.Char
-data Date = MkDate Int Int Int deriving Show
-
+data Date = MkDate Int Int Int deriving (Eq, Show, Ord)
 addDays :: Date -> Int -> Date
 addDays (MkDate day month year) dys =
     let

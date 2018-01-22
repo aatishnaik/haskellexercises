@@ -2,17 +2,17 @@ module Chapter3.ExamScore2 where
 import Data.Char
 import Data.List
         
-data StudentName = MkStudentName String deriving Show
-data SubjectName = MkSubjectName String deriving Show
-data SubjectMarks = MkSubjectMarks Int deriving Show
-data SubjectArr= MkSubjectArr [SubjectName] deriving Show
-data MarkSheet = MkMarkSheet [(StudentName,[(SubjectName,SubjectMarks)])] deriving Show
+data StudentName = MkStudentName String deriving (Eq, Show, Ord)
+data SubjectName = MkSubjectName String deriving (Eq, Show, Ord)
+data SubjectMarks = MkSubjectMarks Int deriving (Eq, Show, Ord)
+data SubjectArr= MkSubjectArr [SubjectName] deriving (Eq, Show, Ord)
+data MarkSheet = MkMarkSheet [(StudentName,[(SubjectName,SubjectMarks)])] deriving (Eq, Show, Ord)
 
 subAvg :: MarkSheet -> SubjectArr -> SubjectName -> Float
-subAvg mksheet subjects (MkSubjectName subname) = 
+subAvg mksheet subjects subname = 
     let validSubs = allValidSubjects mksheet subjects
         subs = map (\x -> (snd x)) validSubs
-        subarr = map (\x -> (filter (\(MkSubjectName namesb,markssub) -> namesb == subname) x )) subs
+        subarr = map (\x -> (filter (\(namesb,markssub) -> namesb == subname) x )) subs
         scoresarr = concat subarr
         scores = map (\(namesub,markssub) -> markssub) scoresarr
         tarr = map (\(MkSubjectMarks x)-> x) scores
@@ -20,10 +20,10 @@ subAvg mksheet subjects (MkSubjectName subname) =
 
 
 filterSubjects :: Bool -> MarkSheet -> SubjectArr -> StudentName -> [(SubjectName,SubjectMarks,String)]
-filterSubjects filterFn (MkMarkSheet markSheet) subjects (MkStudentName studName) = 
-    let subs = filter (\ (MkStudentName studentName, scoreList) -> studentName == studName) markSheet
+filterSubjects filterFn (MkMarkSheet markSheet) subjects studName = 
+    let subs = filter (\ (studentName, scoreList) -> studentName == studName) markSheet
         subjectList = snd (head subs)
-        validSubs = map (\x -> (checkScore (MkMarkSheet markSheet) subjects (MkStudentName studName) (fst x))) subjectList
+        validSubs = map (\x -> (checkScore (MkMarkSheet markSheet) subjects studName (fst x))) subjectList
         list = filter (\ (namesub,markssub,flag,msg) -> (filterFn == flag)) validSubs
     in map (\ (namesub,markssub,flag,msg) -> (namesub,markssub,msg)) list
 
@@ -36,7 +36,6 @@ allValidSubjects :: MarkSheet -> SubjectArr -> [(StudentName,[(SubjectName,Subje
 allValidSubjects (MkMarkSheet markSheet) subjects =
     let validNames = map (\x -> (fst x,(filterSubjects True (MkMarkSheet markSheet) subjects (fst x)))) markSheet
     in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) validNames
-
 
 checkScore :: MarkSheet -> SubjectArr -> StudentName -> SubjectName -> (SubjectName,SubjectMarks,Bool,String)
 checkScore (MkMarkSheet mksheet) (MkSubjectArr subjects) (MkStudentName studname) (MkSubjectName subname) =  
@@ -67,10 +66,10 @@ duplicateNames :: MarkSheet -> [StudentName]
 duplicateNames markSheet = filterNames (\x -> length x > 1) markSheet
 
 calculateSd :: MarkSheet -> SubjectArr -> SubjectName -> Float 
-calculateSd mksheet subjects (MkSubjectName subname) =
-    let avg = subAvg mksheet subjects (MkSubjectName subname)
+calculateSd mksheet subjects subname =
+    let avg = subAvg mksheet subjects subname
         subScores = map (\x -> snd x) (allValidSubjects mksheet subjects)
-        subarr = map (\x -> (filter (\(MkSubjectName namesub,MkSubjectMarks markssub) -> namesub == subname) x )) subScores
+        subarr = map (\x -> (filter (\(namesub,MkSubjectMarks markssub) -> namesub == subname) x )) subScores
         mksArr = map (\(MkSubjectName x,MkSubjectMarks y) -> (fromIntegral y)-avg) (concat subarr)
         squareArr = map (\x -> (x*x)) mksArr
         variance = (sum squareArr) / fromIntegral (length squareArr)
