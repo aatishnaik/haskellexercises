@@ -11,11 +11,10 @@ module Chapter2.ExamScore2 where
     subAvg markSheet subjects subjname =
         let validSubs = allValidNames markSheet subjects
             subs = map (\x -> (snd x)) validSubs
-            subarr = map (\x -> (filter (\(namesub,markssub) -> namesub == subjname) x )) subs
-            scoresarr = concat subarr
+            scoresarr = concatMap (\x -> (filter (\(namesub,markssub) -> namesub == subjname) x )) subs
             scores = map (\(namesub,markssub) -> markssub) scoresarr
         in fromIntegral (sum scores) / fromIntegral (length scores)
-    
+
     filterNames :: ([StudentName] -> Bool) -> MarkSheet -> [StudentName]
     filterNames filterFn markSheet =
         let studentNames = map (\ (studentName, scoreList) -> studentName) markSheet
@@ -68,8 +67,8 @@ module Chapter2.ExamScore2 where
     calculateSd mksheet subjects subname =
         let avg = subAvg mksheet subjects subname
             subScores = map (\x -> snd x) (allValidSubjects mksheet subjects)
-            subarr = map (\x -> (filter (\(namesub,markssub) -> namesub == subname) x )) subScores
-            mksArr = map (\x -> (fromIntegral(snd x))-avg) (concat subarr)
+            subarr = concatMap (\x -> (filter (\(namesub,markssub) -> namesub == subname) x )) subScores
+            mksArr = map (\x -> (fromIntegral(snd x))-avg) subarr
             squareArr = map (\x -> (x*x)) mksArr
             variance = (sum squareArr) / fromIntegral (length squareArr)
         in sqrt variance

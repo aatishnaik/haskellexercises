@@ -1,7 +1,7 @@
 module Chapter3.ExamScore2 where
 import Data.Char
 import Data.List
-     
+
 data StudentName = MkStudentName String deriving (Eq, Show, Ord)
 data SubjectName = MkSubjectName String deriving (Eq, Show, Ord)
 data SubjectMarks = MkSubjectMarks Int deriving (Eq, Show, Ord)
@@ -12,12 +12,10 @@ subAvg :: MarkSheet -> SubjectArr -> SubjectName -> Float
 subAvg mksheet subjects subname = 
     let validSubs = allValidSubjects mksheet subjects
         subs = map (\x -> (snd x)) validSubs
-        subarr = map (\x -> (filter (\(namesb,markssub) -> namesb == subname) x )) subs
-        scoresarr = concat subarr
+        scoresarr = concatMap (\x -> (filter (\(namesb,markssub) -> namesb == subname) x )) subs
         scores = map (\(namesub,markssub) -> markssub) scoresarr
         tarr = map (\(MkSubjectMarks x)-> x) scores
     in fromIntegral (sum tarr) / fromIntegral(length tarr)
-
 
 filterSubjects :: Bool -> MarkSheet -> SubjectArr -> StudentName -> [(SubjectName,SubjectMarks,String)]
 filterSubjects filterFn (MkMarkSheet markSheet) subjects studName = 
@@ -69,8 +67,8 @@ calculateSd :: MarkSheet -> SubjectArr -> SubjectName -> Float
 calculateSd mksheet subjects subname =
     let avg = subAvg mksheet subjects subname
         subScores = map (\x -> snd x) (allValidSubjects mksheet subjects)
-        subarr = map (\x -> (filter (\(namesub,MkSubjectMarks markssub) -> namesub == subname) x )) subScores
-        mksArr = map (\(MkSubjectName x,MkSubjectMarks y) -> (fromIntegral y)-avg) (concat subarr)
+        subarr = concatMap (\x -> (filter (\(namesub,MkSubjectMarks markssub) -> namesub == subname) x )) subScores
+        mksArr = map (\(MkSubjectName x,MkSubjectMarks y) -> (fromIntegral y)-avg) subarr
         squareArr = map (\x -> (x*x)) mksArr
         variance = (sum squareArr) / fromIntegral (length squareArr)
     in sqrt variance
