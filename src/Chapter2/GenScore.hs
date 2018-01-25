@@ -27,7 +27,17 @@ calculateSd mksheet subjects subname =
         squareArr = map (\x -> (x*x)) mksArr
         variance = (sum squareArr) / fromIntegral (length squareArr)
     in sqrt variance
-
+checkScore :: MarkSheet -> [SubjectName] -> StudentName -> SubjectName -> (SubjectName,SubjectMarks,Bool,String)
+checkScore mksheet subjects studname subname = 
+    let subOfStudent = snd (head (filter (\x -> (fst x) == studname) mksheet))
+        mark = snd (head (filter (\x -> (fst x == subname)) subOfStudent))
+    in if (mark < 0)
+    then (subname,mark,False,"negative score")
+    else if (mark > 100)
+    then (subname,mark,False,"greater than 100")
+    else if not (subname `elem` subjects)
+    then (subname,mark,False,"invalid subject name")
+        else (subname,mark,True,"Valid")
 
 
 filterNames :: ([StudentName] -> Bool) -> MarkSheet -> [StudentName]
@@ -63,19 +73,6 @@ allValidSubjects markSheet subjects =
     let validNames = map (\x -> (fst x,(filterSubjects True markSheet subjects (fst x)))) markSheet
     in map (\(namestud,score) -> (namestud,(map (\(namesub,markssub,msg) -> (namesub,markssub)) score))) validNames
 
-
-    
-checkScore :: MarkSheet -> [SubjectName] -> StudentName -> SubjectName -> (SubjectName,SubjectMarks,Bool,String)
-checkScore mksheet subjects studname subname = 
-    let subOfStudent = snd (head (filter (\x -> (fst x) == studname) mksheet))
-        mark = snd (head (filter (\x -> (fst x == subname)) subOfStudent))
-    in if (mark < 0)
-    then (subname,mark,False,"negative score")
-    else if (mark > 100)
-    then (subname,mark,False,"greater than 100")
-    else if not (subname `elem` subjects)
-    then (subname,mark,False,"invalid subject name")
-        else (subname,mark,True,"Valid")
 
 allValidNames :: MarkSheet -> [SubjectName] -> MarkSheet
 allValidNames mksheet subjects =
