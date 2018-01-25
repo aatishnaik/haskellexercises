@@ -9,30 +9,24 @@ type SubjectMarks = Int
 type MarkSheet = [(String,[(String,Int)])]
 
 --Part 1
-filterNames :: ([StudentName] -> Bool) -> MarkSheet -> [StudentName]
-filterNames filterFn markSheet =
-    let studentNames = map (\ (studentName, scoreList) -> studentName) markSheet
-        groupedStudentNames = group (sort studentNames)
-        filterGroups = filter (\x -> filterFn x) groupedStudentNames
-    in map (\x -> head x) filterGroups
-
-checkScore :: ([(StudentName,[(SubjectName,SubjectMarks,Bool,String)])] -> b) -> MarkSheet -> [SubjectName] -> b
+checkScore :: ([(StudentName,Bool,[(SubjectName,SubjectMarks,Bool,String)])] -> b) -> MarkSheet -> [SubjectName] -> b
 checkScore func mksheet subjects = 
-    let duplicatenames = filterNames (\x -> length x > 1) mksheet
-        newmksheet = filter (\(x,y)-> x `notElem` duplicatenames) mksheet
-        validscore = map (\(studname,scorelist)->(studname,foldl' (\arr (subname,mark) -> 
+    let validscore = map (\(studname,scorelist)->(studname,foldl' (\arr (subname,mark) -> 
                 if (mark < 0)
-                        then arr ++ [(subname,mark,False,"negative score")]
-                        else if (mark > 100)
-                        then arr ++ [(subname,mark,False,"greater than 100")]
-                        else if not (subname `elem` subjects)
-                        then arr ++ [(subname,mark,False,"invalid subject name")]
-                        else arr ++ [(subname,mark,True,"Valid")]) [] scorelist)) newmksheet
-    in func validscore
+                then arr ++ [(subname,mark,False,"negative score")]
+                else if (mark > 100)
+                then arr ++ [(subname,mark,False,"greater than 100")]
+                else if not (subname `elem` subjects)
+                then arr ++ [(subname,mark,False,"invalid subject name")]
+                else arr ++ [(subname,mark,True,"Valid")]) [] scorelist)) mksheet
+        dup = group (sort (map (\(x,y) -> x) validscore))
+        getDup = map (\x-> head x) (filter (\x -> (length x) > 1) dup)
+        setDup = map (\(x,y) -> if (x `elem` getDup) then (x,False,y) else (x,True,y)) validscore
+    in func setDup
 
 calculateScore :: ([SubjectMarks] -> b) -> MarkSheet -> [SubjectName] -> SubjectName -> b
 calculateScore calfunc mksheet subjects subjname =
-    let subs = checkScore (\x -> map(\(a,b) -> b) x) mksheet subjects
+    let subs = checkScore (\x -> map(\(a,k,b) -> b) x) mksheet subjects
         validsubs = concatMap (\scorelist -> (filter (\(sname,smks,key,msg) -> (sname==subjname) && (key == True)) scorelist)) subs
         scores = map (\(sname,smks,key,msg) -> smks) validsubs
     in calfunc scores
@@ -47,13 +41,16 @@ calculateSd mksheet subjects subname =
         variance :: Float = (sum mksArr) / fromIntegral (length mksArr)
     in sqrt variance
 
-duplicateNames :: MarkSheet -> [StudentName]
-duplicateNames markSheet = filterNames (\x -> length x > 1) markSheet
+duplicateNames :: MarkSheet -> [SubjectName] -> [StudentName]
+duplicateNames mksheet subjects= 
+    let list = checkScore (\x -> filter(\(a,k,b) -> k==False) x) mksheet subjects
+    in nub (map (\(a,k,b)->a) list)
 
 invalidScores :: MarkSheet -> [SubjectName] -> [(StudentName,[(SubjectName,SubjectMarks,String)])]
 invalidScores mksheet subjects =
-    let subs = checkScore (\x -> (map (\(stuname,scorelist) -> (stuname,(filter (\(subname,smks,key,msg) -> (key == False)) scorelist)))) x) mksheet subjects
-        newsubs= map (\(stname,scorelist)-> (stname,map (\(subname,submks,key,msg)->(subname,submks,msg)) scorelist)) subs
+    let subs = checkScore (\x -> (map (\(stuname,k,scorelist) -> (stuname,k,(filter (\(subname,smks,key,msg) -> (key == False)) scorelist)))) x) mksheet subjects
+        unisubs = filter (\(a,k,b) -> k) subs
+        newsubs= map (\(stname,k,scorelist)-> (stname,map (\(subname,submks,key,msg)->(subname,submks,msg)) scorelist)) subs
     in newsubs
 
 
@@ -62,9 +59,11 @@ invalidScores mksheet subjects =
 --Part2
 calList :: ([(StudentName,[SubjectName])] -> [(SubjectName,[StudentName])]) -> MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
 calList func mksheet subjects =
-    let subs = checkScore (\x -> (map (\(stuname,scorelist) -> (stuname,(filter (\(subname,smks,key,msg) -> (key == True)) scorelist)))) x) mksheet subjects
-        newsubs = map (\(stname,scorelist)-> (stname,map (\(subname,submks,key,msg)->(subname,submks)) scorelist)) subs
-        newlist = map (\(namestud,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) newsubs
+    let 
+        subs = checkScore (\x -> (map (\(stuname,k,scorelist) -> (stuname,k,(filter (\(subname,smks,key,msg) -> (key == True)) scorelist)))) x) mksheet subjects
+        newsubs = map (\(stname,k,scorelist)-> (stname,k,map (\(subname,submks,key,msg)->(subname,submks)) scorelist)) subs
+        unisubs = filter (\(a,k,b) -> k) newsubs
+        newlist = map (\(namestud,k,scorelist) -> (namestud,(map (\(namesub,mkssub) -> namesub) scorelist))) unisubs
     in func newlist
 
 studentsInSubject :: MarkSheet -> [SubjectName] -> [(SubjectName,[StudentName])]
