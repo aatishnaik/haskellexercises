@@ -8,8 +8,11 @@ type SubjectName = String
 type SubjectMarks = Int
 type MarkSheet = [(String,[(String,Int)])]
 
+mksheet = [("Saurabh Nanda",[("English", 84), ("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("John Doe", [("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("Jane Doe", [("Chemistry", 66), ("Phsyics", 33), ("Geography", 56)]), ("John Doe", [("Chemistry", 90), ("Economics", 45), ("Geography", 56)]),("Bahubali", [("Hindi", 45), ("Biology", -90), ("Geography", -75)]),("Rajnikant", [("Tamil", 110), ("Biology", 100), ("Geography", 100)])]
+subjects = [ "English","Geography","Physics","Chemistry","Economics","Computer Science"]
+
 --Part 1
-checkScore :: ([(StudentName,Bool,[(SubjectName,SubjectMarks,Bool,String)])] -> b) -> MarkSheet -> [SubjectName] -> b
+checkScore :: ([(String,Bool,[(SubjectName,SubjectMarks,Bool,String)])] -> b) -> MarkSheet -> [SubjectName] -> b
 checkScore func mksheet subjects = 
     let validscore = map (\(studname,scorelist)->(studname,foldl' (\arr (subname,mark) -> 
                 if (mark < 0)
