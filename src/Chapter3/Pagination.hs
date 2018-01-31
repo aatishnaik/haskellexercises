@@ -2,6 +2,8 @@ module Chapter3.Pagination where
 import Data.Char
 import Data.List
 
+--pagination using seperate types for page, items and numberofpages
+
 data Page = MkPage Int deriving (Eq, Show, Ord)
 data NItems = MkNItems Int deriving (Eq, Show, Ord)
 data NPage = MkNPage Int deriving (Eq, Show, Ord)
