@@ -62,15 +62,6 @@ invalidScores mksheet =
 
 
 --Part2
-calList :: ([(StudentName,[SubjectName])] -> [(SubjectName,[StudentName])]) -> MarkSheet  -> [(SubjectName,[StudentName])]
-calList func mksheet = foldScore (\arr (sname,k,scorelist)-> if k
-                then arr ++ [(sname,foldl'(\ ar (sub,mks,flag,msg) -> if flag
-                    then ar ++ [sub]
-                    else ar
-                ) [] scorelist)]
-                else arr
-            ) [] mksheet
-
 studentsInSubject :: MarkSheet -> [(SubjectName,[StudentName])]
 studentsInSubject mksheet = 
     let iv = map (\ s -> (s,[])) subjects
