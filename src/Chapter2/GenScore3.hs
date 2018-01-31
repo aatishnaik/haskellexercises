@@ -72,20 +72,30 @@ calList func mksheet = foldScore (\arr (sname,k,scorelist)-> if k
             ) [] mksheet
 
 studentsInSubject :: MarkSheet -> [(SubjectName,[StudentName])]
-studentsInSubject mksheet = calList (\newlist -> map (\s -> (s,(foldl' (\arr (namestud,namesub) -> 
-            if (s `elem` namesub)
-                then arr ++ [namestud]
-                else arr
-            ) [] newlist) )) subjects) mksheet
+studentsInSubject mksheet = 
+    let iv = map (\ s -> (s,[])) subjects
+    in map (\ini -> (foldScore (\(sub,arr) (sname,k,scorelist)-> (sub,if k
+                then if length (filter (\(subj,mk,flag,msg) -> (subj == sub) && (flag==True)) scorelist) > 0
+                    then arr ++ [sname]
+                    else arr
+                else arr)
+                ) ini mksheet)) iv
     
 subjectsInExam :: MarkSheet -> [([SubjectName],[StudentName])]
 subjectsInExam  mksheet =
-    let namelist = calList (\x -> x) mksheet
-        sublist = calList (\newlist -> map (\s -> (s,(foldl' (\arr (namestud,namesub) -> 
-            if (s `elem` namesub)
-                then arr ++ [namestud]
-                else arr
-            ) [] newlist) )) subjects) mksheet
+    let namelist = foldScore (\arr (sname,k,scorelist)-> if k
+                    then arr ++ [(sname,foldl'(\ ar (sub,mks,flag,msg) -> if flag
+                        then ar ++ [sub]
+                        else ar
+                    ) [] scorelist)]
+                    else arr
+                ) [] mksheet
+        sublist = map (\ini -> (foldScore (\(sub,arr) (sname,k,scorelist)-> (sub,if k
+                    then if length (filter (\(subj,mk,flag,msg) -> (subj == sub) && (flag==True)) scorelist) > 0
+                        then arr ++ [sname]
+                        else arr
+                    else arr)
+                    ) ini mksheet)) (map (\ s -> (s,[])) subjects)
         newname = delete [] (nub (map (\(x,y) -> y) namelist))
         newsub =  delete [] (nub (map (\(x,y) -> y) sublist))
         emptyele = filter (\(x,y)-> y == []) sublist
