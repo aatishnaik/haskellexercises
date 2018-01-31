@@ -16,6 +16,13 @@ getOffset (MkDay d)(MkMonth m) y =
     let monthlist = if checkLeap y then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
     in MkDay (d + (sum (take (m-1) monthlist)))
 
+addDays :: Day -> Month -> Year -> Day -> (Day,Month,Year)
+addDays d m y x = 
+    let offset = dayopr (\x y -> x+y) (getOffset d m y) x
+        (y2,mOffset) = addYr y (MkDay offset)
+        (m2,dOffset) = addMon y2 mOffset
+    in (dOffset,m2,y2)
+
 addMon :: Year -> Day -> (Month,Day)
 addMon yr offset =
     let monthlist = if checkLeap yr then [MkDay 31,MkDay 29,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31] else [MkDay 31,MkDay 28,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31]
