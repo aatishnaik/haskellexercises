@@ -21,12 +21,12 @@ getOffset (MkDate d m y) =
 addDays :: Date -> Int -> Date
 addDays (MkDate d m y) x = 
     let offset = (getOffset (MkDate d m y)) + x
-        (y2,mOffset) = addYr y offset
-        (m2,dOffset) = addMon y2 mOffset
+        (y2,mOffset) = addYr (MkDate d m y) offset
+        (m2,dOffset) = addMon (MkDate d m y) mOffset
     in (MkDate dOffset m2 y2)
 
-addMon :: Int -> Int -> (Int,Int)
-addMon yr offset =
+addMon :: Date -> Int -> (Int,Int)
+addMon (MkDate d m yr) offset =
     let monthlist = if checkLeap yr then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
     in foldl' (\(month,off) mday ->
             if (off-mday) > 0
@@ -34,9 +34,9 @@ addMon yr offset =
             else (month,off)
         ) (1,offset) monthlist
 
-addYr :: Int -> Int -> (Int,Int)
-addYr yr offset =
+addYr :: Date -> Int -> (Int,Int)
+addYr (MkDate d m yr) offset =
     let yrd = if checkLeap yr then 366 else 365
     in if (offset-yrd) > 0
-        then addYr (yr+1) (offset-yrd)
+        then addYr (MkDate d m (yr+1)) (offset-yrd)
         else (yr,offset)
