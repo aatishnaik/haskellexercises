@@ -6,20 +6,32 @@ data Day = MkDay Int deriving (Eq, Show, Ord)
 data Month = MkMonth Int deriving (Eq, Show, Ord)
 data Year = MkYear Int deriving (Eq, Show, Ord)
 
-addDays :: (Day, Month, Year) -> Int -> (Day, Month, Year)
-addDays (MkDay day,MkMonth month,MkYear year) dys =
-    let totaldays = day+dys
-        monthlist = if (year `mod` 4) == 0 then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
-        marr = [month..((month + (totaldays `div` 30)))]
-        msum = sum (map (\x->(monthlist!!(x-1))) marr)
-        avg = (fromIntegral msum) `div` (fromIntegral (length marr))
-        xtraday = totaldays `div` avg
-        in(
-            if totaldays <= (monthlist!!month) then MkDay totaldays else MkDay (totaldays `mod` avg),
-            if (totaldays > (monthlist!!month)) && ((month + xtraday) <= 12) then MkMonth (month + xtraday)
-                else if ((day+dys) > avg) && ((month + xtraday) > 12)
-                    then MkMonth ((month + xtraday) `mod` 12)
-                else MkMonth month,
-            if (month + (totaldays `div` avg)) > 12
-                then MkYear (year+((month + xtraday) `mod` 12))
-                else MkYear year)
+checkLeap :: Year -> Bool
+checkLeap (MkYear yr) = if (((yr `mod` 100) /= 0) && ((yr `mod` 4) == 0)) || ((yr `mod` 400) == 0)
+        then True
+        else False
+
+getOffset :: Day -> Month -> Year -> Day
+getOffset (MkDay d)(MkMonth m) y =
+    let monthlist = if checkLeap y then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
+    in MkDay (d + (sum (take (m-1) monthlist)))
+
+addMon :: Year -> Day -> (Month,Day)
+addMon yr offset =
+    let monthlist = if checkLeap yr then [MkDay 31,MkDay 29,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31] else [MkDay 31,MkDay 28,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31]
+    in foldl' (\(month,off) (mday) ->
+            if (dayopr (\x y -> x-y) off mday) > 0
+                then (MkMonth (monopr (\x y -> x+y) month (MkMonth 1)),MkDay (dayopr (\x y -> x-y) off mday))
+            else (month,off)
+        ) (MkMonth 1,offset) monthlist
+
+addYr :: Year -> Day -> (Year,Day)
+addYr yr offset =
+    let yrd = if checkLeap yr then MkDay 366 else MkDay 365
+    in if (dayopr (\x y -> x-y) offset yrd) > 0
+        then ((MkYear (yropr (\x y -> x+y) yr (MkYear 1))),(MkDay (dayopr (\x y -> x-y) offset yrd)))
+        else (yr,offset)
+
+dayopr func (MkDay x) (MkDay y) = func x y
+monopr func (MkMonth x) (MkMonth y) = func x y
+yropr func (MkYear x) (MkYear y) = func x y
