@@ -1,28 +1,28 @@
-module Chapter3.Rail where
+module Chapter3.Rail1 where
 import Data.Char
 import Data.List
+--using types
 
---this approach is better and much faster than the 2nd one
-data Rail = MkRail{
-    rail1 :: String,
-    rail2 :: String,
-    rail3 :: String
-}deriving Show
+type Rail1 = String
+type Rail2 = String
+type Rail3 = String
 
-railfence :: String -> Rail
-railfence str =
-    MkRail{
-        rail1=skipchar (rmspace str) 0 3,
-        rail2=skipchar (rmspace str) 1 1,
-        rail3=skipchar (rmspace str) 2 3
-    }
+rail :: String -> Rail1 -> Rail2 -> Rail3 -> Int -> Int -> String
+rail "" rail1 rail2 rail3 _ _ = rail1 ++ rail2 ++ rail3
+rail inputString rail1 rail2 rail3 currentRail movementDirection
+    |movementDirection == 0 = if currentRail == 1
+        then rail (tail inputString) (rail1 ++ [(head inputString)]) rail2 rail3 (currentRail+1) 0
+        else if currentRail == 2
+            then rail (tail inputString) rail1 (rail2 ++ [(head inputString)]) rail3 (currentRail+1) 0
+        else if currentRail == 3
+            then rail (tail inputString) rail1 rail2 (rail3 ++ [(head inputString)]) (currentRail-1) 1
+        else rail "" rail1 rail2 rail3 0 0
+    |movementDirection == 1 = if currentRail == 2
+        then rail (tail inputString) rail1 (rail2 ++ [(head inputString)]) rail3 (currentRail-1) 0
+        else rail "" rail1 rail2 rail3 0 0
+encode :: String -> String
+encode inputString = rail inputString "" "" "" 1 0
 
-skipchar :: String -> Int -> Int -> String
-skipchar str x n
-    |((length str) > x) = [str!!x] ++ (skipchar str (x+n+1) n)
-    |otherwise = ""
-
-rmspace :: String -> String
-rmspace str = if (length (delete ' ' str)) < (length str) 
-    then rmspace (delete ' ' str)
-    else delete ' ' str
+main :: IO()
+main =
+    print (encode "abcdefghijklmn")

@@ -1,7 +1,9 @@
 module Chapter3.Rail2 where
 import Data.Char
 import Data.List
-    
+
+--using seperate structure for each rail
+
 data Rail1 = MkRail1 String deriving Show
 data Rail2 = MkRail2 String deriving Show
 data Rail3 = MkRail3 String deriving Show
