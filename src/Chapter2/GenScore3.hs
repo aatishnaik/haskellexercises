@@ -20,7 +20,7 @@ foldScore func accumulator mksheet =
                     then arr ++ [(subname,mark,False,"negative score")]
                     else if (mark > 100)
                     then arr ++ [(subname,mark,False,"greater than 100")]
-                    else if not (subname `elem` subjects)
+                    else if (subname `notElem` subjects)
                     then arr ++ [(subname,mark,False,"invalid subject name")]
                     else arr ++ [(subname,mark,True,"Valid")]) [] scorelist)) mksheet
         dup = group (sort (map (\(x,y) -> x) validscore))
