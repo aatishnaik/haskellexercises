@@ -14,10 +14,9 @@ getOffset (MkDate d m y) =
     let monthlist = if checkLeap y then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
     in d + (sum (take (m-1) monthlist))
 
-
 addDays :: Date -> Int -> Date
 addDays (MkDate d m y) x = 
-    let offset = (getOffset (d m y)) + x
+    let offset = (getOffset (MkDate d m y)) + x
         (y2,mOffset) = addYr y offset
         (m2,dOffset) = addMon y2 mOffset
     in (MkDate dOffset m2 y2)
