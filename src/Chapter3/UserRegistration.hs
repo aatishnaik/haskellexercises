@@ -7,12 +7,7 @@ module UserRegistration where
     data User = MkUser
       { userEmail :: Email
       , userFullName :: String
-    
-      -- NOTE: DON'T ever do this in production code. You should be using an
-      -- appropriate type exported by the `bcrypt` library for passwords.
-      --
       , userPassword :: String
-    
       , userPostalCode :: String
       , userStatus :: String
       , userVerificationCode :: String
@@ -33,11 +28,6 @@ module UserRegistration where
                   , userPassword = (nuserPassword newUser)
                   , userPostalCode = (nuserPostalCode newUser)
                   , userStatus = "unverified"
-    
-                  -- NOTE: Pretty lame way of generating a verification code, but
-                  -- let's stick with this, for now, in order to not complicate the
-                  -- example.
-                  --
                   , userVerificationCode = (take 2 email) ++ (take 2 (nuserFullName newUser)) ++ (take 2 (nuserPostalCode newUser))
                   }
       in (user:userDb)
@@ -66,6 +56,6 @@ module UserRegistration where
     replaceUserInDb :: User -> [User] -> [User]
     replaceUserInDb u userDb =
       let (a, b) = Data.List.break (\x -> (userEmail x)==(userEmail u)) userDb
-      in if (Data.List.null b) -- NOTE: Handling the edge-case where the user may not be in the DB
+      in if (Data.List.null b)
           then  (a ++ [u])
           else  (a ++ (u:(tail b)))

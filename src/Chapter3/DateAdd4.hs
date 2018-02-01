@@ -14,8 +14,8 @@ checkLeap yr = if (((yr `mod` 100) /= 0) && ((yr `mod` 4) == 0)) || ((yr `mod` 4
         else False
 
 getOffset :: Date -> Int
-getOffset (MkDate d m y) =
-    let monthlist = monthGetList (MkDate d m y)
+getOffset date@(MkDate d m y) =
+    let monthlist = monthGetList date
     in d + (sum (take (m-1) monthlist))
 
 addDays :: Date -> Int -> Date
@@ -26,8 +26,8 @@ addDays (MkDate d m y) x =
     in (MkDate dOffset m2 y2)
 
 addMon :: Date -> Int -> (Int,Int)
-addMon (MkDate d m yr) offset =
-    let monthlist = monthGetList (MkDate d m yr)
+addMon date@(MkDate d m yr) offset =
+    let monthlist = monthGetList date
     in foldl' (\(month,off) mday ->
             if (off-mday) > 0
                 then (month+1,off-mday)
