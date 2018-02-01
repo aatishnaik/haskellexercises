@@ -12,9 +12,9 @@ checkLeap (MkYear yr) = if (((yr `mod` 100) /= 0) && ((yr `mod` 4) == 0)) || ((y
         else False
 
 getOffset :: Day -> Month -> Year -> Day
-getOffset (MkDay d)(MkMonth m) y =
-    let monthlist = if checkLeap y then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
-    in MkDay (d + (sum (take (m-1) monthlist)))
+getOffset d (MkMonth m) y =
+    let monthlist = monthGetList y
+    in MkDay (dayopr (\x y -> x+y) d (MkDay (foldl' (\val (MkDay dy) -> val+dy) 0 (take (m-1) monthlist))))
 
 addDays :: Day -> Month -> Year -> Day -> (Day,Month,Year)
 addDays d m y x = 
@@ -25,9 +25,9 @@ addDays d m y x =
 
 addMon :: Year -> Day -> (Month,Day)
 addMon yr offset =
-    let monthlist = if checkLeap yr then [MkDay 31,MkDay 29,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31] else [MkDay 31,MkDay 28,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31]
+    let monthlist = monthGetList yr
     in foldl' (\(month,off) (mday) ->
-            if (dayopr (\x y -> x-y) off mday) > 0
+            if (dayopr (\x y -> x-y) off (mday)) > 0
                 then (MkMonth (monopr (\x y -> x+y) month (MkMonth 1)),MkDay (dayopr (\x y -> x-y) off mday))
             else (month,off)
         ) (MkMonth 1,offset) monthlist
@@ -39,6 +39,12 @@ addYr yr offset =
         then ((MkYear (yropr (\x y -> x+y) yr (MkYear 1))),(MkDay (dayopr (\x y -> x-y) offset yrd)))
         else (yr,offset)
 
+monthGetList :: Year -> [Day]
+monthGetList yr = if checkLeap yr then [MkDay 31,MkDay 29,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31] else [MkDay 31,MkDay 28,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31,MkDay 31,MkDay 30,MkDay 31,MkDay 30,MkDay 31]
+
+dayopr :: (Int -> Int -> Int) -> Day -> Day -> Int
 dayopr func (MkDay x) (MkDay y) = func x y
+monopr :: (Int -> Int -> Int) -> Month -> Month -> Int
 monopr func (MkMonth x) (MkMonth y) = func x y
+yropr :: (Int -> Int -> Int) -> Year -> Year -> Int
 yropr func (MkYear x) (MkYear y) = func x y

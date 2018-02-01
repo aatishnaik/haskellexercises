@@ -8,9 +8,8 @@ checkLeap yr = if (((yr `mod` 100) /= 0) && ((yr `mod` 4) == 0)) || ((yr `mod` 4
 
 getOffset :: Int -> Int -> Int -> Int
 getOffset d m y =
-    let monthlist = if checkLeap y then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
+    let monthlist = monthGetList y
     in d + (sum (take (m-1) monthlist))
-
 
 addDays :: Int -> Int -> Int -> Int -> (Int,Int,Int)
 addDays d m y x = 
@@ -21,7 +20,7 @@ addDays d m y x =
 
 addMon :: Int -> Int -> (Int,Int)
 addMon yr offset =
-    let monthlist = if checkLeap yr then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
+    let monthlist = monthGetList yr
     in foldl' (\(month,off) mday ->
             if (off-mday) > 0
                 then (month+1,off-mday)
@@ -34,3 +33,6 @@ addYr yr offset =
     in if (offset-yrd) > 0
         then addYr (yr+1) (offset-yrd)
         else (yr,offset)
+
+monthGetList :: Int -> [Int]
+monthGetList yr = if checkLeap yr then [31,29,31,30,31,30,31,31,30,31,30,31] else [31,28,31,30,31,30,31,31,30,31,30,31]
