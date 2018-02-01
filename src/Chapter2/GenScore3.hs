@@ -8,8 +8,10 @@ type SubjectName = String
 type SubjectMarks = Integer
 type MarkSheet = [(String,[(String,Integer)])]
 
+mksheet :: MarkSheet
 mksheet = [("Saurabh Nanda",[("English", 84), ("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("John Doe", [("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("Jane Doe", [("Chemistry", 66), ("Phsyics", 33), ("Geography", 56)]), ("John Doe", [("Chemistry", 90), ("Economics", 45), ("Geography", 56)]),("Bahubali", [("Hindi", 45), ("Biology", -90), ("Geography", -75)]),("Rajnikant", [("Tamil", 110), ("Biology", 100), ("Geography", 100)])]
-subjects = [ "English","Geography","Physics","Chemistry","Economics","Computer Science"]
+subjects :: [SubjectName]
+subjects = [MkSubjectName "English",MkSubjectName "Geography",MkSubjectName "Physics",MkSubjectName "Chemistry",MkSubjectName "Economics",MkSubjectName "Computer Science"]
 
 --Part 1
 
