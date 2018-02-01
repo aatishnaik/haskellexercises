@@ -14,7 +14,7 @@ totalPage (MkNItems ti) (MkNItems ip) = if ((ti `mod` ip) == 0)
     else (ti `div` ip)+1
 
 getString :: Page -> Page -> Page -> String
-getString (MkPage fp) (MkPage lp) (MkPage cp) = (intercalate "|" (map (\s -> show s) [fp..(cp-1)])) ++ ("|" ++ (show cp) ++ "*|") ++ (intercalate "|" (map (\s -> show s) [(cp+1)..lp]))
+getString (MkPage fp) (MkPage lp) (MkPage cp) = intercalate " | " (map (\s -> (show s) ++ (if s==cp then "*" else "")) [fp..lp])
 
 
 formatPagination :: Page -> Page -> Page -> (Bool,Bool) -> String
