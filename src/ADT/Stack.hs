@@ -1,6 +1,4 @@
 module ADT.Stack where
-import Data.Char
-import Data.List
 
 data Node = Element Int Node
     | Empty
