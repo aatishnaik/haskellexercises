@@ -36,8 +36,9 @@ showlist e arr= case e of
         in showlist prev str
     Last -> arr
 
+decodeLength :: Expr -> String -> String
 decodeLength e arr = case e of 
     EChar c v _ prev -> decodeLength prev ((printChar v c)++ arr)
     Last -> arr
-
+printChar :: Char -> Int -> String
 printChar c n = foldl' (\str _ -> str++[c]) "" [1..n]
