@@ -6,7 +6,9 @@ data Expr = EChar Int Char Expr Expr
     deriving (Eq, Show, Ord)
 
 lengthEncode :: String -> String
-lengthEncode str = showlist (encodeLength Last str) ""
+lengthEncode str = 
+    let node = encodeLength Last str
+    in "Encoded: "++(showlist node "") ++ "  Decoded: " ++decodeLength node ""
 
 encodeLength :: Expr -> String -> Expr
 encodeLength e inputStr = 
@@ -30,6 +32,12 @@ append e value = case e of
 showlist :: Expr -> String -> String
 showlist e arr= case e of 
     EChar c v _ prev -> 
-        let str = if c > 1 then (show c)++[v]++" "++ arr else [v]++arr
+        let str = if c > 1 then (show c)++[v]++arr else [v]++arr
         in showlist prev str
     Last -> arr
+
+decodeLength e arr = case e of 
+    EChar c v _ prev -> decodeLength prev ((printChar v c)++ arr)
+    Last -> arr
+
+printChar c n = foldl' (\str _ -> str++[c]) "" [1..n]
