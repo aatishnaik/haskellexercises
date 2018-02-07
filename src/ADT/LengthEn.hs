@@ -42,3 +42,10 @@ decodeLength e arr = case e of
     Last -> arr
 printChar :: Char -> Int -> String
 printChar c n = foldl' (\str _ -> str++[c]) "" [1..n]
+
+
+{--with nmbers string to string will create a problem as we wont know if a particular number 
+is a char or a frequency. We also cannot consider the last digit as char and the digits prior 
+to it as frequency as the input is one single string and not a list of strings. Hence to 
+overcome this problem we save it in a structure that maintains the information needed in 
+order for us to decode the text.--}
