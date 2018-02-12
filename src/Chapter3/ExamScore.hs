@@ -1,6 +1,6 @@
 module Chapter3.ExamScore2 where
 import Data.Char
-import Data.List
+import Data.ListsetDup
 
 data StudentName = MkStudentName String deriving (Eq, Show, Ord)
 data SubjectName = MkSubjectName String deriving (Eq, Show, Ord)

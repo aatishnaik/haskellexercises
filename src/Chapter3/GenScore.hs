@@ -1,6 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Chapter3.GenExamScore where
-import Data.Char
 import Data.List
 
 data StudentName = MkStudentName String deriving (Eq, Show, Ord)
