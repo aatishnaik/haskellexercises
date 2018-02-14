@@ -3,7 +3,7 @@ module ADT.LinkedList where
 data Node a = Element a (Node a)
     | Empty
     deriving (Eq, Show, Ord)
-    
+
 --simplify insertion. Inserts all elements from list to LL
 createList ::  Eq a => [a] -> Node a -> Node a
 createList list first = 
@@ -23,6 +23,11 @@ prepend :: Node a -> a -> Node a
 prepend first value = case first of 
     Element _ _ -> Element value first
     Empty -> Element value Empty
+
+instance Eq Node a where
+    (==) (Element val (Node nxt)) (Element val1 (Node nxt1)) = val == val1 && nxt == nxt1
+    (==) Empty Empty = True
+    (==) _ _ == False
 
     --2
 append ::  Eq a => Node a -> a -> Node a
