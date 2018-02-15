@@ -12,14 +12,22 @@ instance Eq a => Eq (Node a) where
     (/=) _ _ = False
 
 instance Ord a => Ord (Node a) where
-    (>=) (Element val _) (Element val1 _) = val >= val1
+    compare (Element val nxt) (Element val1 nxt1) = if (val == val1)
+                                                    then compare nxt nxt1
+                                                    else if val > val1
+                                                        then GT
+                                                    else LT
+    compare (Element _ _) Empty = GT
+    compare Empty (Element _ _) = LT
+    compare Empty Empty = EQ
+{--    (>=) (Element val _) (Element val1 _) = val >= val1
     (>=) _ _ = False
     (>) (Element val _) (Element val1 _) = val > val1
     (>) _ _ = False
     (<=) (Element val _) (Element val1 _) = val <= val1
     (<=) _ _ = False
     (<) (Element val _) (Element val1 _) = val < val1
-    (<) _ _ = False
+    (<) _ _ = False--}
 
 instance Show a => Show (Node a) where
     show (Element val nxt) = show val ++" "++ show nxt
