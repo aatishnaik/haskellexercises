@@ -5,17 +5,17 @@ data Node = Element Int Node
     deriving (Eq, Show, Ord)
 
 --simplify insertion. Inserts all elements from list to LL
-createList :: [Int] -> Node -> Node
-createList list first = 
+fromList :: [Int] -> Node -> Node
+fromList list first = 
     case first of 
     Element _ _ -> if (list /= []) 
-        then createList (init list) $ Element (last list) first
+        then fromList (init list) $ Element (last list) first
         else first
-    Empty -> createList (init list) $ Element (last list) Empty
+    Empty -> fromList (init list) $ Element (last list) Empty
 
-showlist :: Node -> [Int] -> [Int]
-showlist ele arr = case ele of 
-    Element val nxt -> (showlist nxt (arr++[val]))
+tolist :: Node -> [Int] -> [Int]
+tolist ele arr = case ele of 
+    Element val nxt -> (tolist nxt (arr++[val]))
     Empty -> arr
 
 --1

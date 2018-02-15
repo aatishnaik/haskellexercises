@@ -1,24 +1,42 @@
-module ADT.LinkedList where
+module UniLinkedList where
 
 data Node a = Element a (Node a)
     | Empty
-    deriving (Eq, Show, Ord)
 
-instance Eq Node where
-    
+instance Eq a => Eq (Node a) where
+    (==) (Element val nxt) (Element val1 nxt1) = val == val1 && nxt == nxt1
+    (==) Empty Empty = True
+    (==) _ _ = False
+    (/=) (Element val nxt) (Element val1 nxt1) = val /= val1 && nxt /= nxt1
+    (/=) Empty Empty = True
+    (/=) _ _ = False
+
+instance Ord a => Ord (Node a) where
+    (>=) (Element val _) (Element val1 _) = val >= val1
+    (>=) _ _ = False
+    (>) (Element val _) (Element val1 _) = val > val1
+    (>) _ _ = False
+    (<=) (Element val _) (Element val1 _) = val <= val1
+    (<=) _ _ = False
+    (<) (Element val _) (Element val1 _) = val < val1
+    (<) _ _ = False
+
+instance Show a => Show (Node a) where
+    show (Element val nxt) = show val ++" "++ show nxt
+    show Empty = "Empty"
 
 --simplify insertion. Inserts all elements from list to LL
-createList ::  Eq a => [a] -> Node a -> Node a
-createList list first = 
+fromList :: Eq a => [a] -> Node a -> Node a
+fromList list first = 
     case first of 
-    Element _ _ -> if (list /= []) 
-        then createList (init list) (Element (last list) first) 
-        else first
-    Empty -> createList (init list) (Element (last list) Empty)
+    Element _ _ -> case list of
+        [] -> first
+        _ -> fromList (init list) (Element (last list) first)
+    Empty -> fromList (init list) (Element (last list) Empty)
 
-showlist :: Node a -> [a] -> [a]
-showlist ele arr = case ele of 
-    Element val nxt -> (showlist nxt (arr++[val]))
+tolist :: Node a -> [a] -> [a]
+tolist ele arr = case ele of 
+    Element val nxt -> (tolist nxt (arr++[val]))
     Empty -> arr
 
 --1
@@ -29,10 +47,9 @@ prepend first value = case first of
 --2
 append ::  Eq a => Node a -> a -> Node a
 append first value = case first of 
-    Element val nxt -> if nxt == Empty
-        then Element value Empty
-        else 
-            Element val (append nxt value)
+    Element val nxt -> case nxt of
+        Empty -> Element value Empty
+        _ -> Element val (append nxt value)
     Empty -> Empty
 
 --3
@@ -66,23 +83,22 @@ reverseList first new = case first of
     Empty -> new
 
 --7
-getIndex :: Eq a => Node a -> a -> Int -> String
+getIndex :: Eq a => Node a -> a -> Int -> Maybe Int
 getIndex ele value pos = case ele of 
     Element val nxt -> if val==value
-        then "Element found at " ++ show (pos+1)
+        then Just (pos+1)
         else getIndex nxt value (pos+1)
-    Empty -> "Element not found"
+    Empty -> Nothing
 
 --8
 breakList :: Node a -> Int -> (Node a,Node a)
-breakList first pos = breakL first pos first 0
+breakList first pos = if pos < (getLength first 0) then breakL first pos first 0 else (Empty,Empty)
+        where breakL first1 pos1 f cpos = case first1 of 
+                Element _ nxt -> if pos1 == cpos
+                    then (cropList f pos1 0,first1)
+                    else breakL nxt pos1 f (cpos+1)
+                Empty -> (Empty,Empty)
 
-breakL :: Node a -> Int -> Node a -> Int -> (Node a,Node a)
-breakL first pos f cpos = case first of 
-    Element _ nxt -> if pos == cpos
-        then (cropList f pos 0,first)
-        else breakL nxt pos f (cpos+1)
-    Empty -> (Empty,Empty)
 
 cropList :: Node a -> Int -> Int -> Node a
 cropList first pos cpos = case first of 

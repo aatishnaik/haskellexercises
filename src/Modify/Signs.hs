@@ -12,4 +12,6 @@ instance Ord Sign where
     --(<)Pos Neg = False
     --(<)Neg Pos = True
     (>) _ _ = False
+    (<=) _ _ = False
+    (>=) _ _ = False
     --(<) _ _ = False

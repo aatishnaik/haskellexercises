@@ -4,18 +4,17 @@ data Node a = Element a (Node a)
     | Empty
     deriving (Show,Ord)
 
---simplify insertion. Inserts all elements from list to LL
-createList ::  Eq a => [a] -> Node a -> Node a
-createList list first = 
+fromList ::  Eq a => [a] -> Node a -> Node a
+fromList list first = 
     case first of 
     Element _ _ -> if (list /= []) 
-        then createList (init list) (Element (last list) first)
+        then fromList (init list) (Element (last list) first)
         else first
-    Empty -> createList (init list) (Element (last list) Empty)
+    Empty -> fromList (init list) (Element (last list) Empty)
 
-showlist :: Node a -> [a] -> [a]
-showlist ele arr = case ele of 
-    Element val nxt -> (showlist nxt (arr++[val]))
+tolist :: Node a -> [a] -> [a]
+tolist ele arr = case ele of 
+    Element val nxt -> (tolist nxt (arr++[val]))
     Empty -> arr
 
 instance Eq a => Eq (Node a) where
@@ -25,6 +24,7 @@ instance Eq a => Eq (Node a) where
     (/=) (Element val nxt) (Element val1 nxt1) = val /= val1 && nxt /= nxt1
     (/=) Empty Empty = True
     (/=) _ _ = False
+
     --1
 prepend :: Node a -> a -> Node a
 prepend first value = case first of 
