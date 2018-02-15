@@ -2,14 +2,14 @@ module ADT.LinkedList where
 
 data Node a = Element a (Node a)
     | Empty
-    deriving (Eq, Show, Ord)
+    deriving (Show,Ord)
 
 --simplify insertion. Inserts all elements from list to LL
 createList ::  Eq a => [a] -> Node a -> Node a
 createList list first = 
     case first of 
     Element _ _ -> if (list /= []) 
-        then createList (init list) (Element (last list) first) 
+        then createList (init list) (Element (last list) first)
         else first
     Empty -> createList (init list) (Element (last list) Empty)
 
@@ -18,19 +18,21 @@ showlist ele arr = case ele of
     Element val nxt -> (showlist nxt (arr++[val]))
     Empty -> arr
 
+instance Eq a => Eq (Node a) where
+    (==) (Element val nxt) (Element val1 nxt1) = val == val1 && nxt == nxt1
+    (==) Empty Empty = True
+    (==) _ _ = False
+    (/=) (Element val nxt) (Element val1 nxt1) = val /= val1 && nxt /= nxt1
+    (/=) Empty Empty = True
+    (/=) _ _ = False
     --1
 prepend :: Node a -> a -> Node a
 prepend first value = case first of 
     Element _ _ -> Element value first
     Empty -> Element value Empty
 
-instance Eq Node a where
-    (==) (Element val (Node nxt)) (Element val1 (Node nxt1)) = val == val1 && nxt == nxt1
-    (==) Empty Empty = True
-    (==) _ _ == False
-
     --2
-append ::  Eq a => Node a -> a -> Node a
+append :: Eq a => Node a -> a -> Node a
 append first value = case first of 
     Element val nxt -> if nxt == Empty
         then Element value Empty
