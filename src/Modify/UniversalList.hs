@@ -54,12 +54,14 @@ append first value = case first of
     Empty -> Empty
 
 --3
-insertAtPos :: Node a -> a -> Int -> Int -> Node a
-insertAtPos first value pos cpos = case first of 
-    Element val nxt -> if pos == (cpos+1)
-        then Element value nxt
-        else Element val (insertAtPos nxt value pos (cpos+1))
-    Empty -> Empty
+insertAtPos :: Node a -> a -> Int -> Node a
+insertAtPos firstEle eleValue position = iPos firstEle eleValue position 0
+            where iPos first value pos cpos = case first of 
+                    Element val nxt -> if pos == (cpos+1)
+                        then Element value nxt
+                        else Element val (iPos nxt value pos (cpos+1))
+                    Empty -> Empty
+
 
 --4
 removeIndex :: Node a -> Int -> Node a
@@ -71,7 +73,6 @@ removeIndex first bIndex = rmIndex first bIndex 0
                             in Element val n
                         else Element val (rmIndex nxt pos (cpos+1))
                     Empty -> Empty
-
 
 --5
 getLength :: Node a -> Int
