@@ -1,4 +1,4 @@
-module ADT.LinkedList where
+module LinkedList where
 
 data Node a = Element a (Node a)
     | Empty
