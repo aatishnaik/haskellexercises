@@ -7,7 +7,7 @@ instance Eq a => Eq (Node a) where
     (==) (Element val nxt) (Element val1 nxt1) = val == val1 && nxt == nxt1
     (==) Empty Empty = True
     (==) _ _ = False
-    (/=) (Element val nxt) (Element val1 nxt1) = val /= val1 && nxt /= nxt1
+    (/=) (Element val nxt) (Element val1 nxt1) = val /= val1 || nxt /= nxt1
     (/=) Empty Empty = True
     (/=) _ _ = False
 
