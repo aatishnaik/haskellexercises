@@ -62,20 +62,23 @@ insertAtPos first value pos cpos = case first of
     Empty -> Empty
 
 --4
-rmIndex :: Node a -> Int -> Int -> Node a
-rmIndex ele pos cpos = case ele of 
-    Element val nxt -> if (pos-2) == cpos
-        then
-            let Element _ n = nxt
-            in Element val n
-        else Element val (rmIndex nxt pos (cpos+1))
-    Empty -> Empty
+removeIndex :: Node a -> Int -> Node a
+removeIndex first bIndex = rmIndex first bIndex 0
+            where rmIndex ele pos cpos = case ele of 
+                    Element val nxt -> if (pos-2) == cpos
+                        then
+                            let Element _ n = nxt
+                            in Element val n
+                        else Element val (rmIndex nxt pos (cpos+1))
+                    Empty -> Empty
+
 
 --5
-getLength :: Node a -> Int -> Int
-getLength first cpos = case first of 
-    Element _ nxt -> getLength nxt (cpos+1)
-    Empty -> cpos
+getLength :: Node a -> Int
+getLength firstEle = gLen firstEle 0
+        where gLen first cpos = case first of 
+                Element _ nxt -> gLen nxt (cpos+1)
+                Empty -> cpos
 
 --6
 reverseList :: Node a -> Node a -> Node a
@@ -93,7 +96,7 @@ getIndex ele value pos = case ele of
 
 --8
 breakList :: Node a -> Int -> (Node a,Node a)
-breakList first pos = if pos < (getLength first 0) then breakL first pos first 0 else (Empty,Empty)
+breakList first pos = if pos < (getLength first) then breakL first pos first 0 else (Empty,Empty)
         where breakL first1 pos1 f cpos = case first1 of 
                 Element _ nxt -> if pos1 == cpos
                     then (cropList f pos1 0,first1)
