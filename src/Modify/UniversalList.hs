@@ -62,7 +62,6 @@ insertAtPos firstEle eleValue position = iPos firstEle eleValue position 0
                         else Element val (iPos nxt value pos (cpos+1))
                     Empty -> Empty
 
-
 --4
 removeIndex :: Node a -> Int -> Node a
 removeIndex first bIndex = rmIndex first bIndex 0
@@ -82,10 +81,11 @@ getLength firstEle = gLen firstEle 0
                 Empty -> cpos
 
 --6
-reverseList :: Node a -> Node a -> Node a
-reverseList first new = case first of 
-    Element val nxt -> reverseList nxt (Element val new)
-    Empty -> new
+reverseList :: Node a -> Node a
+reverseList firstEle = revList firstEle Empty
+            where revList first new = case first of 
+                    Element val nxt -> revList nxt (Element val new)
+                    Empty -> new
 
 --7
 getIndex :: Eq a => Node a -> a -> Int -> Maybe Int
