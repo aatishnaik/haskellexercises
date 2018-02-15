@@ -44,6 +44,7 @@ prepend :: Node a -> a -> Node a
 prepend first value = case first of 
     Element _ _ -> Element value first
     Empty -> Element value Empty
+
 --2
 append :: Node a -> a -> Node a
 append first value = case first of 
@@ -98,13 +99,11 @@ breakList first pos = if pos < (getLength first 0) then breakL first pos first 0
                     then (cropList f pos1 0,first1)
                     else breakL nxt pos1 f (cpos+1)
                 Empty -> (Empty,Empty)
+                where cropList firstEle positn cpositn = case firstEle of 
+                        Element val nxt -> if positn == cpositn
+                            then Empty
+                            else Element val (cropList nxt positn (cpositn+1))
+                        Empty -> Empty
 
-
-cropList :: Node a -> Int -> Int -> Node a
-cropList first pos cpos = case first of 
-    Element val nxt -> if pos == cpos
-        then Empty
-        else Element val (cropList nxt pos (cpos+1))
-    Empty -> Empty
 
 
