@@ -1,3 +1,5 @@
+module Modify.Sign where
+
 data Sign = Pos | Neg | Mul | Div
 instance Eq Sign where
     (==) Pos Pos = True
