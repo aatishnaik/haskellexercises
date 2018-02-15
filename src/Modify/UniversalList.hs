@@ -26,7 +26,7 @@ instance Show a => Show (Node a) where
     show Empty = "Empty"
 
 --simplify insertion. Inserts all elements from list to LL
-fromList :: Eq a => [a] -> Node a -> Node a
+fromList :: [a] -> Node a -> Node a
 fromList list first = 
     case first of 
     Element _ _ -> case list of
@@ -45,7 +45,7 @@ prepend first value = case first of
     Element _ _ -> Element value first
     Empty -> Element value Empty
 --2
-append ::  Eq a => Node a -> a -> Node a
+append :: Node a -> a -> Node a
 append first value = case first of 
     Element val nxt -> case nxt of
         Empty -> Element value Empty
