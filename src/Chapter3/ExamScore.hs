@@ -1,5 +1,4 @@
 module Chapter3.ExamScore2 where
-import Data.Char
 import Data.List
 
 data StudentName = MkStudentName String deriving (Eq, Show, Ord)

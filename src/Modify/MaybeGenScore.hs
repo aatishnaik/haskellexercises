@@ -28,7 +28,7 @@ foldScore func accumulator marksheet =
         setDup = map (\(x,y) -> if (x `elem` getDup) then (x,Nothing) else (x,Just y)) validscore
     in foldl' (\acc x -> func acc x) accumulator setDup
 
-subAvg :: MarkSheet -> SubjectName -> Float
+subAvg :: MarkSheet -> SubjectName -> Maybe Float
 subAvg marksheet subjname = 
     let (ttl,len) = foldScore (\(sumc,num) (_,scorelist) ->
             case scorelist of
@@ -37,25 +37,28 @@ subAvg marksheet subjname =
                         then (s+mks,n+1)
                         else (s,n)) (sumc,num) scl
                     ) (0,0) marksheet
-    in fromIntegral ttl / len
+    in if ttl > 0 then Just (fromIntegral ttl / len) else Nothing
 
 calculateSd :: MarkSheet -> SubjectName -> Float 
 calculateSd marksheet subjname =
     let avg = subAvg mksheet subjname
-        mksarr = foldScore (\arr (_,scorelist) -> 
+        mksarr = foldScore (\arr (_,scorelist) ->
+            case avg of
+                Nothing -> [Nothing]
+                Just _ ->
                     case scorelist of
-                        Just scl -> foldl' (\ar (sub,mks,flag,_) -> 
+                        Just scl -> foldl' (\ar (sub,mks,flag,_) ->
                                     if (sub == subjname) && flag
-                                        then ar ++ [((**) (fromIntegral mks - avg) 2)]
+                                        then ar ++ [((**) ((fromIntegral mks) - avg) 2)]
                                     else ar) arr scl
                         Nothing -> arr
             ) [] marksheet
-        variance = (sum mksarr) / fromIntegral (length mksarr)
+        sm 
+        variance = sm / fromIntegral (length mksarr)
     in sqrt variance
 
-
 duplicateNames :: MarkSheet -> [StudentName]
-duplicateNames marksheet = 
+duplicateNames marksheet =
     let list = foldScore (\arr (a,sc) ->
             case sc of
                 Nothing -> arr
@@ -68,25 +71,24 @@ invalidScores marksheet =
     let subs = foldScore (\arr (stuname,Just scorelist) -> arr ++ [(stuname,(filter (\(_,_,flag,_) -> flag == False)) scorelist)]) [] marksheet
     in subs
 
-
 --Part2
 studentsInSubject :: MarkSheet -> [(SubjectName,[StudentName])]
 studentsInSubject marksheet = 
     let iv = map (\ s -> (s,[])) subjects
-    in map (\ini -> (foldScore (\(sub,arr) (sname,scorelist)-> 
+    in map (\ini -> (foldScore (\(sub,arr) (sname,scorelist)->
         (sub,case scorelist of
                 Nothing -> arr
                 Just scl -> if length (filter (\(subj,_,flag,_) -> (subj == sub) && (flag==True)) scl) > 0
                             then arr ++ [sname]
                             else arr)
                 ) ini marksheet)) iv
-    
+
 subjectsInExam :: MarkSheet -> [([SubjectName],[StudentName])]
 subjectsInExam  marksheet =
-    let namelist = foldScore (\arr (sname,scorelist)-> 
+    let namelist = foldScore (\arr (sname,scorelist)->
                     case scorelist of
                         Nothing -> arr
-                        Just scl -> arr ++ [(sname,foldl'(\ ar (sub,_,flag,_) -> 
+                        Just scl -> arr ++ [(sname,foldl'(\ ar (sub,_,flag,_) ->
                                     if flag
                                         then ar ++ [sub]
                                     else ar
