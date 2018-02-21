@@ -17,8 +17,7 @@ data User = User
   , userEmail :: String
   } deriving (Eq, Show, Ord)
 
-type UITable = Map.Map User ([Permission], Map.Map Role [Permission])
-
+type UITable = Map.Map User ([Permission], [Map Role [Permission]])
 -- [(userId, email)]
 userList :: [(Int, String)]
 userList = [(1,"abc@abc.com"),(2,"bbc@abc.com"),(3,"cbc@cbc.com"),(4,"dbc@abc.com")]
@@ -39,21 +38,31 @@ rolePermissions = [(1,Just 3,Nothing),(1,Nothing,Just 4)]
 permissionList :: [(Int,Int,Int, String, String, String)]
 permissionList = [(1,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(1,2,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(2,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(3,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar"),(4,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar")]
 
---prepareUITable :: UITable
-prepareUITable = DL.map (\(uluId,ulEmail)->(
-  --ulEmail,
-    let 
-      rset = DL.filter (\(pluId,_,_,_,_,_)-> pluId == uluId) permissionList
-      rList = DL.map (\(_,trid,_,_,_,_)-> DL.foldl' (\arr (rluId,rlrolId,rlDes)-> if (rluId==uluId && rlrolId==trid) then arr++[] ) [] roleList)) rset
-      --permset = DL.nub (DL.map (\(pluId,plrolId,plpermId,_,_,plDes)->(pluId,plrolId,plpermId,plDes)) permissionList)
-      rolperm = DL.nub (DL.map (\(pluId,plrolId,plpermId)->(pluId,plrolId,plpermId)) (DL.filter (\(rluId,_,_)->rluId==uluId) roleList))
-    in rolperm--DL.map (\(rlId,rlName)-> (rlName,DL.map (\(prolid,pid,pdesc)-> pdesc) (DL.filter (\(idrol,idp,descp)-> rlId==idrol) permset))) rList
-  --,DL.map (\(_,_,_,_,e)->e) (DL.filter (\(ipuId,_,_,_,_)-> ipuId == uluId) individualPermissions)
-  )) userList
+prepareUITable :: Map.Map User ([Permission], [Map Role [Permission]])
+prepareUITable = Map.fromList 
+  (DL.map (\(uluId,ulEmail)->(
+    User {userId=uluId,userEmail=ulEmail},(
+      DL.map (\(_,ipPid,ipAct,ipCls,ipDes)-> Permission {permissionId=ipPid,permissionAction=ipAct,permissionClass=ipCls,permissionDescripton=ipDes}
+      ) (DL.filter (\(ipUId,_,_,_,_)-> uluId == ipUId) individualPermissions)
+      ,
+      DL.map
+        (\(_,rpRolId,_)->
+          Map.fromList (
+              DL.foldl' (\arr (rlUId,rlRolId,rlName) ->
+                arr ++ [(Role {roleId=rlUId,roleName=rlName},
+                      DL.map (\(_,_,plPermId,plAct,plCls,plDes)-> Permission{permissionId=plPermId,permissionAction=plAct,permissionClass=plCls,permissionDescripton=plDes}) (DL.filter (\(plUId,plRolId,_,_,_,_)-> plUId == uluId && plRolId == rlRolId) permissionList))]
+              ) [] (DL.filter (\(rlUId,_,_) -> rlUId == uluId && 
+                (case rpRolId of
+                  Just _ -> True
+                  Nothing -> False)
+              ) roleList)
+            )
+        )
+      rolePermissions
+  ))) userList)
 
---DL.map (\(usrid,rolid,rolname) -> (DL.filter (\(uid,rid,pid,ac,cl,des) -> rid == rolid) permissionList)) roleList
-
--- This function will generate a well-formatted (mulit-line) string to display
--- the UI table on the console.
---displayUITable :: UITable -> String
---displayUITable = _writeThisFunction
+--displayUITable :: UITable -> 
+{--displayUITable uiTable = Map.map (\(k,v)->
+    let (indv,rol) = v
+    in Map.map () rol
+  ) uiTable--}

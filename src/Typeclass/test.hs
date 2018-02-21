@@ -1,4 +1,7 @@
 module Typeclass.Test where
+
+import qualified Data.Map as Mp
+
 data Node a = Element a (Node a) | Empty deriving (Eq,Show)
 x :: Num a => Node a
 x = Element 1 (Element 2 (Element 3 (Element 4 Empty)))
@@ -42,3 +45,10 @@ case ll of
     LLEmpty -> iv – TODO – is this correct? LLNode x ll2 ->
         let newIv = fn iv x
         in Prelude.foldl fn newIv ll2 null ll = Prelude.null $ foldMap (x -> [x]) ll
+
+
+setData :: (Mp.Map Int String)
+setData = Mp.fromList [(1,"abc"),(2,"bbc"),(3,"ccc")]
+
+getData :: Int -> Maybe String
+getData key = Mp.lookup key setData
