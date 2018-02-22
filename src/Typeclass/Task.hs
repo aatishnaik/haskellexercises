@@ -68,8 +68,17 @@ prepareUITable = Map.fromList --outer map
       rolePermissions
   ))) userList)
 
---displayUITable :: UITable -> 
-{--displayUITable uiTable = Map.map (\(k,v)->
-    let (indv,rol) = v
-    in Map.map () rol
-  ) uiTable--}
+displayUITable :: UITable -> [(String, ([String], [(String, [String])]))]
+displayUITable uiTable = DL.map (\(k,v)->(
+    let User {userId=_,userEmail=email} = k
+    in email
+    ,
+    let 
+      (inperm,roles) = v
+      ipermList = DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) inperm
+    in (ipermList,
+      DL.map (\(Role{roleId=_,roleName=rolname},rolperm)->(rolname,
+      DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) rolperm
+      )) roles
+    )
+  )) (toList uiTable)

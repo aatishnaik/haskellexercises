@@ -72,9 +72,8 @@ prepareUITable = Map.fromList (DL.map (\(uId,email,ipermid,_,_,_,rolid,_,_,_,_,_
         ) [] joinResults)
       )
     )) joinResults)
-{-}
 --displayUITable :: UITable -> 
-displayUITable uiTable = Map.map (\(k,v)->
+{-displayUITable uiTable = Map.map (\(k,v)->
     let (indv,rol) = v
     in Map.map (\(id,email)->email) rol
   ) uiTable-}
