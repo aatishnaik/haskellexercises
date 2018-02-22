@@ -39,20 +39,27 @@ permissionList :: [(Int,Int,Int, String, String, String)]
 permissionList = [(1,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(1,2,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(2,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(3,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar"),(4,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar")]
 
 prepareUITable :: Map.Map User ([Permission], [Map Role [Permission]])
-prepareUITable = Map.fromList 
+prepareUITable = Map.fromList --outer map
   (DL.map (\(uluId,ulEmail)->(
-    User {userId=uluId,userEmail=ulEmail},(
+    --attach user object
+    User {userId=uluId,userEmail=ulEmail},( 
+      --attach permission list from indv permissions of the userid
       DL.map (\(_,ipPid,ipAct,ipCls,ipDes)-> Permission {permissionId=ipPid,permissionAction=ipAct,permissionClass=ipCls,permissionDescripton=ipDes}
-      ) (DL.filter (\(ipUId,_,_,_,_)-> uluId == ipUId) individualPermissions)
+      ) (DL.filter (\(ipUId,_,_,_,_)-> uluId == ipUId) individualPermissions) --filter indv permissions mattching the user id
       ,
+      --iterate through rolelist
       DL.map
         (\(_,rpRolId,_)->
+          -- inner Map
           Map.fromList (
+              --iterate through roles having a value
               DL.foldl' (\arr (rlUId,rlRolId,rlName) ->
+                --attach role object
                 arr ++ [(Role {roleId=rlUId,roleName=rlName},
+                      --map to iterate and attach permission object
                       DL.map (\(_,_,plPermId,plAct,plCls,plDes)-> Permission{permissionId=plPermId,permissionAction=plAct,permissionClass=plCls,permissionDescripton=plDes}) (DL.filter (\(plUId,plRolId,_,_,_,_)-> plUId == uluId && plRolId == rlRolId) permissionList))]
               ) [] (DL.filter (\(rlUId,_,_) -> rlUId == uluId && 
-                (case rpRolId of
+                (case rpRolId of --filter roles and choose that have a value
                   Just _ -> True
                   Nothing -> False)
               ) roleList)
