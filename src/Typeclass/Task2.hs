@@ -22,7 +22,9 @@ type UITable = Map.Map User ([Permission], Map.Map Role [Permission])
 
 --[(userId,email,permissionId,action,class,description,roleId,roleName,permissionId,action,class,description)]
 joinResults :: [(Int,String,Maybe Int,Maybe String,Maybe String,Maybe String,Maybe Int,Maybe String,Maybe Int,Maybe String,Maybe String,Maybe String)]
-joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"abc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar")]
+joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),
+(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),
+(3,"abc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar")]
 
 prepareUITable :: UITable
 prepareUITable = Map.fromList (DL.map (\(uId,email,ipermid,_,_,_,rolid,_,_,_,_,_)->( --outer map
@@ -68,10 +70,13 @@ prepareUITable = Map.fromList (DL.map (\(uId,email,ipermid,_,_,_,rolid,_,_,_,_,_
               ) []
           joinResults)]
           else oarr
-        _->oarr
+        _-> oarr
         ) [] joinResults)
       )
     )) joinResults)
+
+fixRepeat :: UITable -> UITable
+
 
 displayUITable :: UITable -> [(String, ([String], [(String, [String])]))]
 displayUITable uiTable = DL.map (\(k,v)->(

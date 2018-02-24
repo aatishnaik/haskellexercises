@@ -17,7 +17,7 @@ data User = User
   , userEmail :: String
   } deriving (Eq, Show, Ord)
 
-type UITable = Map.Map User ([Permission], [Map Role [Permission]])
+type UITable = Map.Map User ([Permission], [Map.Map Role [Permission]])
 -- [(userId, email)]
 userList :: [(Int, String)]
 userList = [(1,"abc@abc.com"),(2,"bbc@abc.com"),(3,"cbc@cbc.com"),(4,"dbc@abc.com")]
@@ -38,7 +38,7 @@ rolePermissions = [(1,Just 3,Nothing),(1,Nothing,Just 4)]
 permissionList :: [(Int,Int,Int, String, String, String)]
 permissionList = [(1,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(1,2,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(2,1,1,"manage_agents","Common::Client","Allowed to manage agent clients"),(3,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar"),(4,1,3,"manage_calendar","Trips::Trip","Allowed to edit Departure calendar")]
 
-prepareUITable :: Map.Map User ([Permission], [Map Role [Permission]])
+prepareUITable :: UITable
 prepareUITable = Map.fromList --outer map
   (DL.map (\(uluId,ulEmail)->(
     --attach user object
@@ -77,8 +77,8 @@ displayUITable uiTable = DL.map (\(k,v)->(
       (inperm,roles) = v
       ipermList = DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) inperm
     in (ipermList,
-      DL.map (\(Role{roleId=_,roleName=rolname},rolperm)->(rolname,
-      DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) rolperm
+      DL.map (\(Role{roleId=_,roleName=rolname},rolperm)-> (rolname,
+        DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) rolperm
       )) roles
     )
   )) (toList uiTable)
