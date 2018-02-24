@@ -20,7 +20,7 @@ data User = User
 
 type UITable = Map.Map User ([Permission], Map.Map Role [Permission])
 joinResults :: [(Int,String,Maybe Int,Maybe String,Maybe String,Maybe String,Maybe Int,Maybe String,Maybe Int,Maybe String,Maybe String,Maybe String)]
-joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"abc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar"),(3,"abc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 2,Just "Reservation Manager",Just 2,Just "manage_Bus",Just "Trips::Trip",Just "Allowed to edit Bus")]
+joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar"),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 2,Just "Reservation Manager",Just 2,Just "manage_Bus",Just "Trips::Trip",Just "Allowed to edit Bus")]
 
 prepareUITable :: UITable
 prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> 
@@ -54,11 +54,33 @@ prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)->
         ) accMap 
     ) Map.empty joinResults
 
-displayUITable :: UITable -> [(String, ([String], [(String, [String])]))]
-displayUITable uiTable = DL.map (\(k,v)->(
+--displayUITable :: UITable ->[[(String, (String, String), String)]]
+displayUITable uiTable = DL.map (\ (email,y)->
+        let
+            (iperms,rs) = y
+            nemail=20
+            nperm=40
+            nrole=30
+            nmaxI= (nmaxIPerm y)
+            nmaxR= (nmaxRPerm y)
+            nmax = if  nmaxI > nmaxR then nmaxI else nmaxR
+            usrEmails = [fixStr email nemail] ++ (DL.map (\ _ -> (fixStr "" nemail)) [1..nmax-1])
+            usrIPerms = if nmaxI==nmax
+                then DL.map (\x->fixStr x nperm) iperms
+                else DL.map (\x->(fixStr x nperm)++"\n") iperms ++ (DL.map (\_-> (fixStr "" nperm)++"\n") [1..(nmaxR-nmaxI)])
+            usrR = DL.foldl' (\rList (role,rperms)->
+                    rList ++ (zip ([(fixStr role nrole)] ++ (DL.map (\_ -> (fixStr "" nrole)) [1..(length rperms)])) rperms)
+                ) [] rs
+            usrRPerms = if nmaxR==nmax
+                then usrR
+                else usrR ++ (DL.map (\_-> ((fixStr "" nrole),(fixStr "" nperm))) [1..(nmaxI-nmaxR)])
+        in (usrEmails,usrRPerms,usrIPerms)
+    ) (showUITable uiTable)
+
+showUITable :: UITable -> [(String, ([String], [(String, [String])]))]
+showUITable uiTable = DL.map (\(k,v)->(
     let User {userId=_,userEmail=email} = k
-    in email
-    ,
+    in email,
     let 
       (inperm,roles) = v
       ipermList = DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) inperm
@@ -66,5 +88,18 @@ displayUITable uiTable = DL.map (\(k,v)->(
       DL.map (\(Role{roleId=_,roleName=rolname},rolperm)->(rolname,
       DL.map (\Permission{permissionId=_,permissionAction=_,permissionClass=_,permissionDescripton=pdes}->pdes) rolperm
       )) (toList roles)
-    )
-  )) (toList uiTable)
+    ))) (toList uiTable)
+
+fixStr :: String -> Int -> String
+fixStr str n = setsp str (n - (length str))
+        where setsp st i = if i<=0
+                            then st
+                            else setsp (st ++ " ") (i-1)
+
+nmaxIPerm :: ([String], [(String, [String])]) -> Int
+nmaxIPerm (iperm,_) = DL.foldl' (\c _ -> c+1) 0 iperm
+
+nmaxRPerm :: ([String], [(String, [String])]) -> Int
+nmaxRPerm (_,rperm) = DL.foldl' (\c (_,perm) ->
+        c+(DL.foldl' (\cr _ -> cr+1) 0 perm)
+    ) 0 rperm
