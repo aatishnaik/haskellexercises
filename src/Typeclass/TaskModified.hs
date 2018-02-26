@@ -55,6 +55,7 @@ prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)->
     ) Map.empty joinResults
 
 --displayUITable :: UITable ->[[(String, (String, String), String)]]
+displayUITable :: UITable ->[([String], [(String, String)], [String])]
 displayUITable uiTable = DL.map (\ (email,y)->
         let
             (iperms,rs) = y
