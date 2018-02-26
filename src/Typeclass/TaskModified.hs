@@ -59,22 +59,22 @@ prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> --out
         ) accMap 
     ) Map.empty joinResults
 
-displayUITable :: UITable ->[[(String, (String, String), String)]]
+displayUITable :: UITable ->[[(String,(String,String),String)]]
 displayUITable uiTable = DL.map (\ (email,y)->
         let
             (iperms,rs) = y --pattern match tuple
             --max size of emails
-            sizeEmail=DL.foldl' (\m x -> if (length (fst x))>m then length (fst x) else m) 0 (showUITable uiTable)
+            sizeEmail=DL.foldl' (\m x -> if (length (fst x))>m then length (fst x) else m) 0 (showUITable uiTable) +3
             --max size of perms
             sizePerm=(DL.foldl' (\m (_,(ipermArr,_)) -> 
                 let si = DL.foldl' (\m2 x -> if length x > m2 then length x else m2) 0 ipermArr 
                 in if si > m then si else m
-                ) 0 (showUITable uiTable))+5
+                ) 0 (showUITable uiTable))+7
             --max size of roles
             sizeRole=DL.foldl' (\m (_, (_,rls)) -> 
                 let si = DL.foldl' (\m2 (x,_) -> if length x > m2 then length x else m2) 0 rls
                 in if si > m then si else m
-                ) 0 (showUITable uiTable)
+                ) 0 (showUITable uiTable)+3
             --number of indv perms
             nmaxI= (nmaxIPerm y)
             --number of role perms
@@ -103,7 +103,8 @@ displayUITable uiTable = DL.map (\ (email,y)->
                     else usrR ++ rpSet
                 where rpSet = let arr = [1..(nmaxI-nmaxR)]
                             in DL.map (\_-> ((fixStr "" sizeRole),(fixStr "" sizePerm))) arr
-        in zip3 usrEmails usrRPerms usrIPerms
+        in let final = zip3 usrEmails usrRPerms usrIPerms
+            in final
     ) (showUITable uiTable)
 
 --extracts needed string field from objects
@@ -138,3 +139,6 @@ nmaxRPerm :: ([String], [(String, [String])]) -> Int
 nmaxRPerm (_,rperm) = DL.foldl' (\c (_,perm) ->
         c+(DL.foldl' (\cr _ -> cr+1) 0 perm)
     ) 0 rperm
+
+showTable :: IO()
+showTable = putStr (DL.foldl' (\ac x->DL.foldl' (\acstr(e,(r,rp),ip)-> acstr ++ (e++r++rp++ip)) ac x) "" (displayUITable (prepareUITable)))
