@@ -24,7 +24,8 @@ joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip"
 
 prepareUITable :: UITable
 prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> --outerfold
-    let indvP= DL.foldl' (\iperms (_,_,Just fiperId,Just fiperAct,Just fiperCls,Just fiperDes,_,_,_,_,_,_)-> 
+    let --indv perms
+        indvP= DL.foldl' (\iperms (_,_,Just fiperId,Just fiperAct,Just fiperCls,Just fiperDes,_,_,_,_,_,_)-> 
                 let addiperm = [(Permission {permissionId = fiperId,permissionAction=fiperAct,permissionClass=fiperCls,permissionDescripton=fiperDes})]
                 in iperms++addiperm
                 ) [] filteredIp--gather indv perms
@@ -32,7 +33,8 @@ prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> --out
                     case (fpid,fpact,fpcls,fpdes) of
                         (Just _,Just _,Just _,Just _) -> True
                         _ -> False
-                    ) joinResults)--filter table for uid
+                    ) joinResults)--filter just values in table for uid
+        --role perms
         rolP= DL.foldl' (\rperms (_,_,_,_,_,_,Just frolId,Just frolName,Just _,Just _,Just _,Just _)->
                     --insert roles to map
                     Map.insert (Role {roleId = frolId,roleName = frolName}) (
@@ -41,7 +43,7 @@ prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> --out
                                     (Just rrrid,Just _,Just _,Just _,Just _,Just _) -> 
                                         if rrrid == frid then True else False
                                     _ -> False
-                                ) joinResults)
+                                ) joinResults)--filter just values for role perms
                         in DL.foldl' (\rolperms (_,_,_,_,_,_,_,_,Just ffpid,Just ffpact,Just ffpcls,Just ffpdes)->
                                     rolperms ++ [Permission {permissionId=ffpid,permissionAction=ffpact,permissionClass=ffpcls,permissionDescripton=ffpdes}]
                                 ) [] filRPerms
@@ -103,8 +105,7 @@ displayUITable uiTable = DL.map (\ (email,y)->
                     else usrR ++ rpSet
                 where rpSet = let arr = [1..(nmaxI-nmaxR)]
                             in DL.map (\_-> ((fixStr "" sizeRole),(fixStr "" sizePerm))) arr
-        in let final = zip3 usrEmails usrRPerms usrIPerms
-            in final
+        in zip3 usrEmails usrRPerms usrIPerms --zip all padded columns
     ) (showUITable uiTable)
 
 --extracts needed string field from objects
