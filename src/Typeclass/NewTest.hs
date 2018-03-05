@@ -1,9 +1,12 @@
 {-# OPTIONS_GHC -fwarn-incomplete-uni-patterns #-}
-module Typeclass.TaskModified where
+module Typeclass.NewTest where
 
 import Data.List as DL
 import Data.Map.Strict as Map
-import Debug.Trace
+
+type UITable = Map.Map User ([Permission], Map.Map Role [Permission])
+joinResults :: [(Int,String,Maybe Int,Maybe String,Maybe String,Maybe String,Maybe Int,Maybe String,Maybe Int,Maybe String,Maybe String,Maybe String)]
+joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"ccc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar"),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 2,Just "Reservation Manager",Just 2,Just "manage_Bus",Just "Trips::Trip",Just "Allowed to edit Bus")]
 
 data Permission = Permission
   { permissionId :: Int
@@ -20,48 +23,6 @@ data User = User
   , userEmail :: String
   } deriving (Eq, Show, Ord)
 
-type UITable = Map.Map User ([Permission], Map.Map Role [Permission])
-joinResults :: [(Int,String,Maybe Int,Maybe String,Maybe String,Maybe String,Maybe Int,Maybe String,Maybe Int,Maybe String,Maybe String,Maybe String)]
-joinResults = [(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(2,"bbc@bc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(1,"abc@abc.com",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"ccc@abc.com",Just 1,Just "Reserve Bus",Just "Trips::Trip",Just "Allowed to edit Bus",Nothing,Nothing,Nothing,Nothing,Nothing,Nothing),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 1,Just "Reservation Manager",Just 1,Just "manage_calendar",Just "Trips::Trip",Just "Allowed to edit Departure calendar"),(3,"ccc@abc.com",Nothing,Nothing,Nothing,Nothing,Just 2,Just "Reservation Manager",Just 2,Just "manage_Bus",Just "Trips::Trip",Just "Allowed to edit Bus")]
-
-prepareUITable :: UITable
-prepareUITable = DL.foldl' (\accMap (usrId,usrEmail,_,_,_,_,_,_,_,_,_,_)-> --outerfold
-    let --indv perms
-        indvP= DL.foldl' (\iperms (_,_,Just fiperId,Just fiperAct,Just fiperCls,Just fiperDes,_,_,_,_,_,_)-> 
-                let addiperm = [(Permission {permissionId = fiperId,permissionAction=fiperAct,permissionClass=fiperCls,permissionDescripton=fiperDes})]
-                in iperms++addiperm
-                ) [] filteredIp--gather indv perms
-            where filteredIp = (DL.filter (\(fuid,_,fpid,fpact,fpcls,fpdes,_,_,_,_,_,_)->fuid==usrId && 
-                    case (fpid,fpact,fpcls,fpdes) of
-                        (Just _,Just _,Just _,Just _) -> True
-                        _ -> False
-                    ) joinResults)--filter just values in table for uid
-        --role perms
-        rolP= DL.foldl' (\rperms (_,_,_,_,_,_,Just frolId,Just frolName,Just _,Just _,Just _,Just _)->
-                    --insert roles to map
-                    Map.insert (Role {roleId = frolId,roleName = frolName}) (
-                        let filRPerms = (DL.filter (\(fuid,_,_,_,_,_,frid,frname,fpid,fpact,fpcls,fpdes)->fuid==usrId && 
-                                case (Just frid,Just frname,Just fpid,Just fpact,Just fpcls,Just fpdes) of
-                                    (Just rrrid,Just _,Just _,Just _,Just _,Just _) -> 
-                                        if rrrid == frid then True else False
-                                    _ -> False
-                                ) joinResults)--filter just values for role perms
-                        in DL.foldl' (\rolperms (_,_,_,_,_,_,_,_,Just ffpid,Just ffpact,Just ffpcls,Just ffpdes)->
-                                    rolperms ++ [Permission {permissionId=ffpid,permissionAction=ffpact,permissionClass=ffpcls,permissionDescripton=ffpdes}]
-                                ) [] filRPerms --get role perms and add
-                    ) rperms
-                ) Map.empty filJoinResults
-            --filtered just values for uid
-            where filJoinResults = DL.filter (\(fuid,_,_,_,_,_,frid,frname,fpid,fpact,fpcls,fpdes)->fuid==usrId && 
-                    case (frid,frname,fpid,fpact,fpcls,fpdes) of
-                        (Just _,Just _,Just _,Just _,Just _,Just _) -> True
-                        _ -> False
-                    ) joinResults
-    --insert user and tuple
-    in Map.insert (User {userId=usrId,userEmail=usrEmail}) (
-            (indvP,rolP)
-        ) accMap 
-    ) Map.empty joinResults
 
 displayUITable :: UITable ->[[(String,(String,String),String)]]
 displayUITable uiTable = DL.map (\ (email,y)->
@@ -148,7 +109,6 @@ showTable :: IO()
 showTable = putStr (DL.foldl' (\ac x->DL.foldl' (\acstr(e,(r,rp),ip)-> acstr ++ (e++r++rp++ip)) ac x) "" (displayUITable (prepareUITable2)))
 
 
--- ([Permission], Map.Map Role [Permission])
 prepareUITable2 :: UITable
 prepareUITable2 = DL.foldl' accumulateMap Map.empty joinResults
     where
@@ -172,25 +132,3 @@ prepareUITable2 = DL.foldl' accumulateMap Map.empty joinResults
             let finalPerms = DL.union oldPerms newPerms
                 finalRoles = Map.unionWith (\oldPerms_ newPerms_ -> DL.union oldPerms_ newPerms_) oldRoles newRoles
             in (finalPerms, finalRoles)
-
--- displayTable2 :: UITable -> String
--- displayTable2 tbl = DL.intercalate "\n" $ DL.map (\(x, y, z, w) -> DL.intercalate " | " [x, y, z, w]) $ DL.reverse $ Map.foldlWithKey accumulateRows [] tbl
---     where
---         accumulateRows :: [(String, String, String, String)] -> User -> ([Permission], Map.Map Role [Permission]) -> [(String, String, String, String)]
---         accumulateRows memo user (permList, roleMap) = case memo of
---             [] -> [(userEmail user, "TODO: roleName", "TODO: rolePerm", "TODO: indPerm")]
---             (email, _, _, _):_ -> if (email == (userEmail user))
---                 then ("", "TODO: roleName", "TODO: rolePerm", "TODO: indPerm"):memo
---                 else (userEmail user, "TODO: roleName", "TODO: rolePerm", "TODO: indPerm"):memo
-
-displayRoleMap :: Map.Map Role [Permission] -> [(String, String)]
-displayRoleMap tbl = Map.foldlWithKey prepareRows [] tbl
-    where
-        prepareRows :: [(String, String)] -> Role -> [Permission] -> [(String, String)]
-        prepareRows memo role perms = case perms of
-            [] -> (roleName role, ""):memo
-            x@(firstPerm:otherPerms) ->
-                DL.foldl' 
-                    (\memo2 p -> ("", permissionDescripton p):memo2)
-                    ((roleName role, permissionDescripton firstPerm):memo)
-                    otherPerms
