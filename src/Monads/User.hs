@@ -70,10 +70,10 @@ userStatusSummary userDb =
   in map (\status -> (status, countUsers status userDb)) statuses
 
 getRegisterUser :: [User] -> IO()
-getRegisterUser usrDb = getLine >>= \email -> 
-  getLine >>= \fname -> 
-    getLine >>= \pass -> 
-      getLine >>= \pcode -> 
+getRegisterUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
+  putStrLn "Enter FullName: " >> getLine >>= \fname -> 
+    putStrLn "Enter Password: " >> getLine >>= \pass -> 
+      putStrLn "Enter PostalCode: " >> getLine >>= \pcode -> 
               let newUsr = MkNewUser { nuserEmail = MkEmail email
                 , nuserFullName = fname
                 , nuserPassword = pass
@@ -82,21 +82,21 @@ getRegisterUser usrDb = getLine >>= \email ->
               in displayUsers (registerUser newUsr usrDb)
 
 getVerifyUser:: [User] -> IO()
-getVerifyUser usrDb = getLine >>= \email -> 
-  getLine >>= \code -> 
+getVerifyUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
+  putStrLn "Enter Verification code: " >> getLine >>= \code -> 
        let (_,_,usrList) = verifyUser (MkEmail email) code usrDb
        in displayUsers usrList
 
 getDeactivateUser :: [User] -> IO()
-getDeactivateUser usrDb = getLine >>= \email -> 
+getDeactivateUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
        let (_,_,usrList) = deactivateUser (MkEmail email) usrDb
        in displayUsers usrList
 
 getReplaceUser :: [User] -> IO()
-getReplaceUser usrDb = getLine >>= \email -> 
-  getLine >>= \fname -> 
-    getLine >>= \pass -> 
-      getLine >>= \pcode -> 
+getReplaceUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
+  putStrLn "Enter FullName: " >> getLine >>= \fname -> 
+    putStrLn "Enter Password: " >> getLine >>= \pass -> 
+      putStrLn "Enter PostalCode: " >> getLine >>= \pcode -> 
               let newUsr = MkUser { userEmail = MkEmail email
                 , userFullName = fname
                 , userPassword =pass
@@ -118,17 +118,16 @@ displayDb usrDb =
   in putStrLn opStr
 
 displayUsers :: [User] -> IO()
-displayUsers usrDb = inpCh
-  --(>>=) (pure "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display\n") inpCh
-                where 
-                  inpCh = getLine >>= \ ch ->
-                    case ch of
-                      "1"-> getRegisterUser usrDb
-                      "2"-> getVerifyUser usrDb
-                      "3"-> getDeactivateUser usrDb
-                      "4"-> getReplaceUser usrDb
-                      "5"-> getCountUser Active usrDb
-                      "6"-> getCountUser Inactive usrDb
-                      "7"-> getCountUser Deactive usrDb
-                      "0"-> displayDb usrDb
-                      _-> putStrLn "Invalid Choice"
+displayUsers usrDb = 
+  (putStrLn "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display\n") >>
+    getLine >>= \ ch ->
+          case ch of
+            "1"-> getRegisterUser usrDb
+            "2"-> getVerifyUser usrDb
+            "3"-> getDeactivateUser usrDb
+            "4"-> getReplaceUser usrDb
+            "5"-> getCountUser Active usrDb
+            "6"-> getCountUser Inactive usrDb
+            "7"-> getCountUser Deactive usrDb
+            "0"-> displayDb usrDb
+            _-> putStrLn "Invalid Choice"
