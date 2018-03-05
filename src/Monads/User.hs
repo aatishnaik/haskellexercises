@@ -114,7 +114,7 @@ getCountUser status usrDb =
 displayDb :: [User] -> IO()
 displayDb usrDb =
   let opStr = foldl' (\op MkUser{userEmail=MkEmail email,userFullName = fname,userPassword = passwd,userPostalCode = pcode,userStatus = status,userVerificationCode = vcode} ->
-        op++" "++email++" "++fname++" "++passwd++" "++pcode++" "++(show status)++" "++vcode++"\n") "" usrDb
+        op++" | "++email++" | "++fname++" | "++passwd++" | "++pcode++" | "++(show status)++" | "++vcode++"|\n") "" usrDb
   in putStrLn opStr
 
 displayUsers :: [User] -> IO()
@@ -126,8 +126,8 @@ displayUsers usrDb =
             "2"-> getVerifyUser usrDb
             "3"-> getDeactivateUser usrDb
             "4"-> getReplaceUser usrDb
-            "5"-> getCountUser Active usrDb
-            "6"-> getCountUser Inactive usrDb
-            "7"-> getCountUser Deactive usrDb
+            "5"-> getCountUser Active usrDb >> displayUsers usrDb
+            "6"-> getCountUser Inactive usrDb >> displayUsers usrDb
+            "7"-> getCountUser Deactive usrDb  >> displayUsers usrDb
             "0"-> displayDb usrDb
-            _-> putStrLn "Invalid Choice"
+            _-> putStrLn "Invalid Choice" >> displayUsers usrDb
