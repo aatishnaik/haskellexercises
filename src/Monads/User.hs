@@ -1,7 +1,7 @@
 module Monads.User where
 
 import Data.List
-
+import Text.Read
 data Email = MkEmail String deriving (Eq, Show, Ord)
 data Status = Active | Inactive | Deactive deriving (Eq, Show, Ord)
 
@@ -121,13 +121,13 @@ displayUsers :: [User] -> IO()
 displayUsers usrDb = 
   (putStrLn "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display\n") >>
     getLine >>= \ ch ->
-          case ch of
-            "1"-> getRegisterUser usrDb >>= displayUsers
-            "2"-> getVerifyUser usrDb >>= displayUsers
-            "3"-> getDeactivateUser usrDb >>= displayUsers
-            "4"-> getReplaceUser usrDb >>= displayUsers
-            "5"-> getCountUser Active usrDb >> displayUsers usrDb
-            "6"-> getCountUser Inactive usrDb >> displayUsers usrDb
-            "7"-> getCountUser Deactive usrDb  >> displayUsers usrDb
-            "0"-> displayDb usrDb
+          case ((readMaybe ch)::Maybe Int) of
+            Just 1 -> getRegisterUser usrDb >>= displayUsers
+            Just 2-> getVerifyUser usrDb >>= displayUsers
+            Just 3-> getDeactivateUser usrDb >>= displayUsers
+            Just 4-> getReplaceUser usrDb >>= displayUsers
+            Just 5-> getCountUser Active usrDb >> displayUsers usrDb
+            Just 6-> getCountUser Inactive usrDb >> displayUsers usrDb
+            Just 7-> getCountUser Deactive usrDb  >> displayUsers usrDb
+            Just 0-> displayDb usrDb
             _-> putStrLn "Invalid Choice" >> displayUsers usrDb
