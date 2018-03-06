@@ -69,7 +69,7 @@ userStatusSummary userDb =
   let statuses = [Active, Inactive, Deactive]
   in map (\status -> (status, countUsers status userDb)) statuses
 
-getRegisterUser :: [User] -> IO()
+getRegisterUser :: [User] -> IO[User]
 getRegisterUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
   putStrLn "Enter FullName: " >> getLine >>= \fname -> 
     putStrLn "Enter Password: " >> getLine >>= \pass -> 
@@ -79,20 +79,20 @@ getRegisterUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email ->
                 , nuserPassword = pass
                 , nuserPostalCode = pcode
                 }
-              in displayUsers (registerUser newUsr usrDb)
+              in pure (registerUser newUsr usrDb)
 
-getVerifyUser:: [User] -> IO()
+getVerifyUser:: [User] -> IO[User]
 getVerifyUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
   putStrLn "Enter Verification code: " >> getLine >>= \code -> 
        let (_,_,usrList) = verifyUser (MkEmail email) code usrDb
-       in displayUsers usrList
+       in pure usrList
 
-getDeactivateUser :: [User] -> IO()
+getDeactivateUser :: [User] -> IO[User]
 getDeactivateUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
        let (_,_,usrList) = deactivateUser (MkEmail email) usrDb
-       in displayUsers usrList
+       in pure usrList
 
-getReplaceUser :: [User] -> IO()
+getReplaceUser :: [User] -> IO[User]
 getReplaceUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email -> 
   putStrLn "Enter FullName: " >> getLine >>= \fname -> 
     putStrLn "Enter Password: " >> getLine >>= \pass -> 
@@ -102,7 +102,7 @@ getReplaceUser usrDb = putStrLn "Enter Email: " >> getLine >>= \email ->
                 , userPassword =pass
                 , userPostalCode = pcode
                 }
-              in displayUsers (replaceUserInDb newUsr usrDb)
+              in pure (replaceUserInDb newUsr usrDb)
 
 getCountUser :: Status -> [User] -> IO()
 getCountUser status usrDb = 
@@ -122,10 +122,10 @@ displayUsers usrDb =
   (putStrLn "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display\n") >>
     getLine >>= \ ch ->
           case ch of
-            "1"-> getRegisterUser usrDb
-            "2"-> getVerifyUser usrDb
-            "3"-> getDeactivateUser usrDb
-            "4"-> getReplaceUser usrDb
+            "1"-> getRegisterUser usrDb >>= displayUsers
+            "2"-> getVerifyUser usrDb >>= displayUsers
+            "3"-> getDeactivateUser usrDb >>= displayUsers
+            "4"-> getReplaceUser usrDb >>= displayUsers
             "5"-> getCountUser Active usrDb >> displayUsers usrDb
             "6"-> getCountUser Inactive usrDb >> displayUsers usrDb
             "7"-> getCountUser Deactive usrDb  >> displayUsers usrDb
