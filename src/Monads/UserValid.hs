@@ -22,7 +22,7 @@ data NewUser = MkNewUser
   } deriving (Eq, Show, Ord)
 
 specExpList :: String
-specExpList = "!@#$%^&*()_?{}[]><.:;|-+=~"
+specExpList = "!@#$%^&*()_?{}[]><.:;|-+=~'`~"
 
 registerUser :: NewUser -> [User] -> Either String [User]
 registerUser newUser@MkNewUser{nuserEmail=(MkEmail email)} userDb =
@@ -152,13 +152,13 @@ validatePassword passwd n
     |n <= 5=
       let flags=  if (length passwd) > 6
           then (foldl' (\(flow,fupp,fdig,fspec,flen) c-> --iterating char by char in password checking
-                if isLower c
+                if isLower c && flow==False
                   then (True,fupp,fdig,fspec,flen)
-                else if isUpper c
+                else if isUpper c && fupp==False
                   then (flow,True,fdig,fspec,flen)
-                else if isDigit c
+                else if isDigit c && fdig==False
                   then (flow,fupp,True,fspec,flen)
-                else if (c `elem` specExpList) --checks in list of spec chars
+                else if (c `elem` specExpList) && fspec==False--checks in list of spec chars
                   then (flow,fupp,fdig,True,flen)
                 else (flow,fupp,fdig,fspec,flen)
             ) (False,False,False,False,True) passwd)
