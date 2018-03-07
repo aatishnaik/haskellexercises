@@ -22,7 +22,7 @@ data NewUser = MkNewUser
   } deriving (Eq, Show, Ord)
 
 specExpList :: String
-specExpList = "!@#$%^&*()_?{}[]><.:;|-+=~'`~"
+specExpList = "!@#$%^&*()_? {}[]><.:;|-+=~'`~"
 
 registerUser :: NewUser -> [User] -> Either String [User]
 registerUser newUser@MkNewUser{nuserEmail=(MkEmail email)} userDb =
@@ -36,25 +36,25 @@ registerUser newUser@MkNewUser{nuserEmail=(MkEmail email)} userDb =
               , userVerificationCode = (take 2 email) ++ (take 2 (nuserFullName newUser)) ++ (take 2 (nuserPostalCode newUser))
               }
     existingUsers = Data.List.filter (\u -> (userEmail u) == (userEmail user)) userDb
-  in if (Data.List.null existingUsers) then Right (user:userDb) else Left "Username already exists TRY AGAIN\n"
+  in if (Data.List.null existingUsers) then Right (user:userDb) else Left "Username already exists TRY AGAIN"
 
 verifyUser :: Email -> String -> [User] -> (Either String [User])
 verifyUser e code userDb =
   let existingUsers = Data.List.filter (\u -> (userEmail u) == e) userDb
   in  if (Data.List.null existingUsers)
-        then Left "No such user exists TRY AGAIN\n"
+        then Left "No such user exists TRY AGAIN"
         else  let existingUser = head existingUsers
               in  if (code==(userVerificationCode existingUser))
                     then  let verifiedUser = existingUser{userStatus=Active}
                               newUserDb = replaceUserInDb verifiedUser userDb
                           in  Right newUserDb
-                    else Left "Incorrect verification code TRY AGAIN\n"
+                    else Left "Incorrect verification code TRY AGAIN"
 
 deactivateUser :: Email -> [User] -> (Either String [User])
 deactivateUser e userDb =
   let existingUsers = Data.List.filter (\u -> (userEmail u) == e) userDb
   in  if (Data.List.null existingUsers)
-        then Left "No such user exists TRY AGAIN\n"
+        then Left "No such user exists TRY AGAIN"
         else  let existingUser = head existingUsers
                   deactiveUser = existingUser{userStatus = Deactive}
               in  Right (replaceUserInDb deactiveUser userDb)
@@ -75,10 +75,10 @@ userStatusSummary userDb =
   in map (\status -> (status, countUsers status userDb)) statuses
 
 getRegisterUser :: [User] -> IO([User])
-getRegisterUser usrDb = validateEmailId "" 0 >>= \email -> 
-  validateName "" 0 >>= \fname -> 
-    validatePassword "" 0 >>= \pass -> 
-      validatePostalCode "" 0 >>= \pcode -> 
+getRegisterUser usrDb = getValidatedEmailId 0 >>= \email -> 
+  getValidatedName 0 >>= \fname -> 
+    getValidatedPassword 0 >>= \pass -> 
+      getValidatedPostalCode 0 >>= \pcode -> 
         let 
             newUsr = MkNewUser { nuserEmail = MkEmail email
                 , nuserFullName = fname
@@ -91,25 +91,25 @@ getRegisterUser usrDb = validateEmailId "" 0 >>= \email ->
             Right usr -> pure (usr)
 
 getVerifyUser:: [User] -> IO[User]
-getVerifyUser usrDb = validateEmailId "" 0 >>= \email -> 
-    validateVcode "" 0 >>= \code -> 
+getVerifyUser usrDb = getValidatedEmailId 0 >>= \email -> 
+    getValidatedVcode 0 >>= \code -> 
        let verifyOp = verifyUser (MkEmail email) code usrDb
        in case verifyOp of
         Right usr -> pure usr
         Left err -> putStrLn err >> getVerifyUser usrDb
 
 getDeactivateUser :: [User] -> IO[User]
-getDeactivateUser usrDb = validateEmailId "" 0 >>= \email -> 
+getDeactivateUser usrDb = getValidatedEmailId 0 >>= \email -> 
        let deactOp = deactivateUser (MkEmail email) usrDb
        in case deactOp of
         Right usr -> pure usr
         Left err -> putStrLn err >> getDeactivateUser usrDb
 
 getReplaceUser :: [User] -> IO[User]
-getReplaceUser usrDb = validateEmailId "" 0 >>= \email -> 
-  validateName "" 0 >>= \fname -> 
-    validatePassword "" 0 >> getLine >>= \pass -> 
-      validatePostalCode "" 0 >> getLine >>= \pcode -> 
+getReplaceUser usrDb = getValidatedEmailId 0 >>= \email -> 
+  getValidatedName 0 >>= \fname ->
+    getValidatedPassword 0 >>= \pass -> 
+      getValidatedPostalCode 0 >>= \pcode -> 
               let newUsr = MkUser { userEmail = MkEmail email
                 , userFullName = fname
                 , userPassword =pass
@@ -130,86 +130,102 @@ displayDb usrDb =
         op++" | "++email++" | "++fname++" | "++passwd++" | "++pcode++" | "++(show status)++" | "++vcode++"|\n") "" usrDb
   in putStrLn opStr
 
+--getFunctions
+getValidatedEmailId :: Int -> IO(String)
+getValidatedEmailId n
+    |n < 4 = putStrLn "Enter Email:" >> getLine >>= \e -> 
+      case (validateEmailId e) of
+        Right em -> pure em
+        Left err -> putStrLn err >> getValidatedEmailId (n+1)
+    |otherwise = error "Invalid EmailId entered"
 
-validateEmailId :: String -> Int -> IO(String)
-validateEmailId email n
-    |n == 0=
-      putStrLn "Enter Email:" >> getLine >>= \e -> validateEmailId e (n+1)
-    |n < 4=
-      let 
-        (a1,a2) = (break (=='@') email)
-        (d1,d2) = (break (=='.') a2)
-      in if (length a1 > 1 && length a2 > 1 && length d1 > 1 && length d2 > 1)
-        then pure email
-        else putStrLn "Invalid Email ENTER AGAIN" >> getLine >>= \e -> validateEmailId e (n+1)
-    |otherwise=
-      error "Invalid EmailId entered.\n"
-
-validatePassword :: String -> Int -> IO(String)
-validatePassword passwd n
-    |passwd == "" && n == 0=
-      putStrLn "Enter Password:" >> getLine >>= \pass -> validatePassword pass (n+1)
-    |n <= 5=
-      let flags=  if (length passwd) > 6
-          then (foldl' (\(flow,fupp,fdig,fspec,flen) c-> --iterating char by char in password checking
-                if isLower c && flow==False
-                  then (True,fupp,fdig,fspec,flen)
-                else if isUpper c && fupp==False
-                  then (flow,True,fdig,fspec,flen)
-                else if isDigit c && fdig==False
-                  then (flow,fupp,True,fspec,flen)
-                else if (c `elem` specExpList) && fspec==False--checks in list of spec chars
-                  then (flow,fupp,fdig,True,flen)
-                else (flow,fupp,fdig,fspec,flen)
-            ) (False,False,False,False,True) passwd)
-            else (False,False,False,False,False)
-      in 
-        case flags of
-          (True,True,True,True,True) -> pure passwd
-          (_,_,_,_,False)-> putStrLn "Password should be of length greater than 6 \n" >> getLine >>= \pass -> validatePassword pass (n+1)
-          (False,_,_,_,True)-> putStrLn "Password should contain LowerCase Letter \n" >> getLine >>= \pass -> validatePassword pass (n+1)
-          (True,False,_,_,True)-> putStrLn "Password should contain UpperCase Letter \n" >> getLine >>= \pass -> validatePassword pass (n+1)
-          (True,True,False,_,True)-> putStrLn "Password should contain a Digit \n" >> getLine >>= \pass -> validatePassword pass (n+1)
-          (True,True,True,False,True)-> putStrLn "Password should contain a Special character \n" >> getLine >>= \pass -> validatePassword pass (n+1)
+getValidatedPassword :: Int -> IO(String)
+getValidatedPassword n
+    |n < 5=
+      putStrLn "Enter Password:" >> getLine >>= \pass -> 
+        case (validatePassword pass) of
+          Right pwd -> pure pwd
+          Left err -> putStrLn err >> getValidatedPassword (n+1)
     |otherwise=
       error "Invalid Password entered multiple times.\n"
 
-validateName :: String -> Int -> IO(String)
-validateName name n
-    |name == "" && n == 0=
-      putStrLn "Enter Full Name:" >> getLine >>= \nme -> validateName nme (n+1)
+getValidatedName :: Int -> IO(String)
+getValidatedName n
     |n < 4=
-      let (s1,s2)= break (==' ') name
-      in if (length s1 > 1 && length s2 > 1)
-        then pure name
-      else putStrLn "FuLLName Invalid ENTER AGAIN\n" >> getLine >>= \nme -> validateName nme (n+1)
+      putStrLn "Enter Full Name:" >> getLine >>= \nme -> 
+        case (validateName nme) of
+          Right fname -> pure fname
+          Left err -> putStrLn err >> getValidatedName (n+1)
     |otherwise =
-      error "Invalid FullName entered.\n"
+      error "Invalid FullName entered."
 
-validatePostalCode :: String -> Int -> IO(String)
-validatePostalCode pcode n
-    |n == 0=
-      putStrLn "Enter Postal code:" >> getLine >>= \pc -> validatePostalCode pc (n+1)
+getValidatedPostalCode :: Int -> IO(String)
+getValidatedPostalCode n
     |n < 4=
-        if ((filter (\c -> not (isDigit c)) pcode) == "") && (length pcode == 6)
-        then pure pcode
-        else putStrLn "Postal code Invalid ENTER AGAIN\n" >> getLine >>= \pc -> validatePostalCode pc (n+1)
+      putStrLn "Enter Postal code:" >> getLine >>= \pc -> 
+        case (validatePostalCode pc) of
+          Right pcode -> pure pcode
+          Left err -> putStrLn err >> getValidatedPostalCode (n+1)
     |otherwise=
         error "Invalid PostalCode entered.\n"
 
-validateVcode :: String -> Int -> IO(String)
-validateVcode vcode n
-    |n == 0=
-      putStrLn "Enter Verification code:" >> getLine >>= \vc -> validateVcode vc (n+1)
-    |vcode == "" && n < 4=
-      putStrLn "Verification code blank ENTER AGAIN\n" >> getLine >>= \vc -> validateVcode vc (n+1)
-    |n > 4=
-         error "Invalid VerificationCode entered.\n"
-    |otherwise= pure vcode
+getValidatedVcode :: Int -> IO(String)
+getValidatedVcode n
+    |n < 4=
+      putStrLn "Verification code blank ENTER AGAIN" >> getLine >>= \vc ->
+        case (validateVcode vc) of
+          Right vcod -> pure vcod
+          Left err -> putStrLn err >> getValidatedVcode (n+1)
+    |otherwise = error "Invalid VerificationCode entered."
+
+--validation functions
+validateEmailId :: String -> Either String String
+validateEmailId email = 
+  let 
+    (a1,a2) = (break (=='@') email)
+    (d1,d2) = (break (=='.') a2)
+  in if (length a1 > 1 && length a2 > 1 && length d1 > 1 && length d2 > 1)
+    then Right email
+    else Left "Invalid Email ENTER AGAIN"
+
+validatePassword :: String -> Either String String
+validatePassword passwd = 
+  let 
+    flen= (length passwd) > 6
+    flow = any isLower passwd
+    fupp = any isUpper passwd
+    fdig = any isDigit passwd
+    fspec = any ( `elem` specExpList) passwd
+  in 
+    case (flow,fupp,fdig,fspec,flen) of
+    (True,True,True,True,True) -> Right passwd
+    (_,_,_,_,False)-> Left "Password should be of length greater than 6"
+    (False,_,_,_,True)-> Left "Password should contain LowerCase Letter"
+    (True,False,_,_,True)-> Left "Password should contain UpperCase Letter"
+    (True,True,False,_,True)-> Left "Password should contain a Digit"
+    (True,True,True,False,True)-> Left "Password should contain a Special character"
+
+validateName :: String -> Either String String
+validateName name =
+    let (s1,s2)= break (==' ') name
+    in
+      if (length s1 > 1 && length s2 > 1)
+        then Right name
+      else Left "FuLLName Invalid ENTER AGAIN"
+
+validatePostalCode :: String -> Either String String
+validatePostalCode pcode = if ((filter (\c -> not (isDigit c)) pcode) == "") && (length pcode == 6)
+  then Right pcode
+  else Left "Postal code Invalid ENTER AGAIN"
+
+validateVcode :: String -> Either String String
+validateVcode vcode = if vcode == ""
+      then Left "Verification code blank ENTER AGAIN"
+      else Right vcode
 
 displayUsers :: [User] -> IO()
 displayUsers usrDb = 
-  (putStrLn "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display\n") >>
+  (putStrLn "1 to Register\n2 to Verify\n3 to Deactivate\n4 to Replace\n5 to Count Active users\n6 to Count Inctive users\n7 to Count Deactive users\n0 to Display") >>
     getLine >>= \ ch ->
           case ((readMaybe ch)::Maybe Int) of
             Just 1-> getRegisterUser usrDb >>= displayUsers
