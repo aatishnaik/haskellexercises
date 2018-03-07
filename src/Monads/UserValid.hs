@@ -1,4 +1,4 @@
-module Monads.User2 where
+module Monads.UserValid where
 import Data.Char
 import Data.List
 import Text.Read
