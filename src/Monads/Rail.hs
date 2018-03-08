@@ -1,13 +1,22 @@
-module Monads.Isbn where
+module Monads.Rail where
 import Data.List
+import Data.Ord
+import Data.Char
 import Text.Read
 
 encode :: Int -> String -> String
-encode n s = map (s !!) $ railsPath n s
+encode n str =  let numL = [1..n] ++ (reverse [2..(n-1)])
+                    cycList = cycle numL
+                    pairList = zip cycList str
+                    sortL = sortBy (comparing fst) pairList
+                in map (\x -> snd x) sortL
+
 decode :: Int -> String -> String
-decode n s = map snd . sort $ zip (railsPath n s) s
-railsPath :: Int -> String -> [Int]
-railsPath n = map snd . sort . zip (cycle $ [1..n] ++ [n-1,n-2..2]) . zipWith const [0..]
+decode n str =  let numL = [1..(length str)]
+                    charNumL = map (\c -> intToDigit c) numL
+                    charPos = zip (encode n charNumL) str
+                    sortL = sortBy (comparing fst) charPos
+                in map (\x -> snd x) sortL
 
 railfence :: IO()
 railfence = putStrLn "Enter 1 to Encode\nEnter 2 to Decode" >>
@@ -17,13 +26,13 @@ railfence = putStrLn "Enter 1 to Encode\nEnter 2 to Decode" >>
                 getLine >>= \str->
                     putStrLn "Enter Key value:" >>
                         getLine >>= \n -> case ((readMaybe n) :: Maybe Int) of
-                            Just k -> putStrLn (encode k str)
+                            Just k -> putStrLn (encode k str) >> railfence
                             _-> putStrLn "Invalid: Key has to be a number" >> railfence
             Just 2-> putStrLn "Enter String to decode:" >>
                 getLine >>= \str->
                     putStrLn "Enter Key value:" >>
                         getLine >>= \n -> 
                             case ((readMaybe n) :: Maybe Int) of
-                                Just k -> putStrLn (decode k str)
+                                Just k -> putStrLn (decode k str) >> railfence
                                 _-> putStrLn "Invalid: Key has to be a number" >> railfence
             _-> putStrLn "Invalid Choice" >> railfence

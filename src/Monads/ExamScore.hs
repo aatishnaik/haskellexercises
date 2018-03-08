@@ -8,8 +8,8 @@ type SubjectMarks = Integer
 type MarkSheet = [(String,[(String,Integer)])]
 
 --Part 1
-foldScore :: (b -> (StudentName,Bool,[(SubjectName,SubjectMarks, Bool, String)]) -> b) -> b -> MarkSheet -> b
-foldScore func accumulator mksheet = 
+foldScore :: (b -> (StudentName,Bool,[(SubjectName,SubjectMarks, Bool, String)]) -> b) -> b -> MarkSheet -> [String] -> b
+foldScore func accumulator mksheet subjects= 
     let validscore = map (\(studname,scorelist)->(studname,foldl' (\arr (subname,mark) -> 
                     if (mark < 0)
                     then arr ++ [(subname,mark,False,"negative score")]
@@ -23,64 +23,63 @@ foldScore func accumulator mksheet =
         setDup = map (\(x,y) -> if (x `elem` getDup) then (x,False,y) else (x,True,y)) validscore
     in foldl' (\acc x -> func acc x) accumulator setDup
 
-subAvg :: MarkSheet -> SubjectName -> Float
-subAvg marksheet subjname = 
+subAvg :: MarkSheet -> SubjectName -> [String] -> Float
+subAvg marksheet subjname subjects= 
     let (ttl,len) = foldScore (\(sumc,num) (_,k,scorelist) -> if k
             then
                 foldl' (\(s,n) (sub,mks,flag,_) -> if (sub == subjname) && flag
                     then (s+mks,n+1)
                     else (s,n)) (sumc,num) scorelist
             else (sumc,num)
-            ) (0,0) marksheet
+            ) (0,0) marksheet subjects
     in fromIntegral ttl / len
 
-calculateSd :: MarkSheet -> SubjectName -> Float 
-calculateSd mksheet subjname =
-    let avg :: Float = subAvg mksheet subjname
+calculateSd :: MarkSheet -> SubjectName -> [String] -> Float 
+calculateSd mksheet subjname subjects=
+    let avg :: Float = subAvg mksheet subjname subjects
         mksarr :: [Float] = foldScore (\arr (_,_,scorelist) -> 
                 foldl' (\ar (sub,mks,flag,_) -> if (sub == subjname) && flag
                 then ar ++ [((**) (fromIntegral mks - avg) 2)]
                 else ar) arr scorelist
-            ) [] mksheet
+            ) [] mksheet subjects
         variance :: Float = (sum mksarr) / fromIntegral (length mksarr)
     in sqrt variance
 
-duplicateNames :: MarkSheet -> [StudentName]
-duplicateNames marksheet = 
-    let list = foldScore (\arr (a,k,_) -> if (k==False) then arr ++ [a] else arr) [] marksheet
+duplicateNames :: MarkSheet -> [String] -> [StudentName]
+duplicateNames marksheet subjects= 
+    let list = foldScore (\arr (a,k,_) -> if (k==False) then arr ++ [a] else arr) [] marksheet subjects
     in nub list
 
-invalidScores :: MarkSheet -> [(StudentName,[(SubjectName,SubjectMarks,Bool,String)])]
-invalidScores marksheet =
-    let subs = foldScore (\arr (stuname,_,scorelist) -> arr ++ [(stuname,(filter (\(_,_,flag,_)-> flag==False)) scorelist)]) [] marksheet
+invalidScores :: MarkSheet -> [String] -> [(StudentName,[(SubjectName,SubjectMarks,Bool,String)])]
+invalidScores marksheet subjects=
+    let subs = foldScore (\arr (stuname,_,scorelist) -> arr ++ [(stuname,(filter (\(_,_,flag,_)-> flag==False)) scorelist)]) [] marksheet subjects
     in subs
-
 --Part2
-studentsInSubject :: MarkSheet -> [(SubjectName,[StudentName])]
-studentsInSubject marksheet = 
+studentsInSubject :: MarkSheet -> [String] -> [(SubjectName,[StudentName])]
+studentsInSubject marksheet subjects= 
     let iv = map (\ s -> (s,[])) subjects
     in map (\ini -> (foldScore (\(sub,arr) (sname,k,scorelist)-> (sub,if k
                 then if length (filter (\(subj,_,flag,_) -> (subj == sub) && (flag==True)) scorelist) > 0
                     then arr ++ [sname]
                     else arr
                 else arr)
-                ) ini marksheet)) iv
+                ) ini marksheet subjects)) iv
     
-subjectsInExam :: MarkSheet -> [([SubjectName],[StudentName])]
-subjectsInExam  marksheet =
+subjectsInExam :: MarkSheet -> [String] -> [([SubjectName],[StudentName])]
+subjectsInExam  marksheet subjects=
     let namelist = foldScore (\arr (sname,k,scorelist)-> if k
                     then arr ++ [(sname,foldl'(\ ar (sub,_,flag,_) -> if flag
                         then ar ++ [sub]
                         else ar
                     ) [] scorelist)]
                     else arr
-                ) [] marksheet
+                ) [] marksheet subjects
         sublist = map (\ini -> (foldScore (\(sub,arr) (sname,k,scorelist)-> (sub,if k
                     then if length (filter (\(subj,_,flag,_) -> (subj == sub) && (flag==True)) scorelist) > 0
                         then arr ++ [sname]
                         else arr
                     else arr)
-                    ) ini marksheet)) (map (\ s -> (s,[])) subjects)
+                    ) ini marksheet subjects)) (map (\ s -> (s,[])) subjects)
         newname = delete [] (nub (map (\(_,y) -> y) namelist))
         newsub =  delete [] (nub (map (\(_,y) -> y) sublist))
         emptyele = filter (\(_,y)-> y == []) sublist
@@ -88,45 +87,99 @@ subjectsInExam  marksheet =
         newlist = zip newname newsub
     in newlist ++ emptylist
 
-mksheetL :: MarkSheet
-mksheetL = [("Saurabh Nanda",[("English", 84), ("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("John Doe", [("Chemistry", 80), ("Physics", 95), ("Geography", 75)]),("Jane Doe", [("Chemistry", 66), ("Phsyics", 33), ("Geography", 56)]), ("John Doe", [("Chemistry", 90), ("Economics", 45), ("Geography", 56)]),("Bahubali", [("Hindi", 45), ("Biology", -90), ("Geography", -75)]),("Rajnikant", [("Tamil", 110), ("Biology", 100), ("Geography", 100)])]
-subjects :: [SubjectName]
-subjects = [ "English","Geography","Physics","Chemistry","Economics","Computer Science"]
+-- Monads part starts here
 
+-- main display function
 displayMkList :: IO()
-displayMkList = putStrLn "Enter 1 for avg Marks\nEnter 2 for Standard deviation\nEnter 3 to get Duplicate names\nEnter 4 to get Invalid scores in subjects\nEnter 5 for Students taking exam in a subject\nEnter 6 for Students that have taken same exams">>
-                    getLine >>= \ch ->
-                        case ((readMaybe ch)::Maybe Int) of
-                            Just 1-> getSubAvg >> displayMkList
-                            Just 2-> getStdDev >> displayMkList
-                            Just 3-> getDuplicates >> displayMkList
-                            Just 4-> getInvalidScores >> displayMkList
-                            Just 5-> print (studentsInSubject mksheetL) >> displayMkList
-                            Just 6-> print (subjectsInExam mksheetL) >> displayMkList
-                            _-> putStrLn "Invalid Choice" >> displayMkList
-getSubAvg :: IO()
-getSubAvg = putStrLn "Enter subjectName:" >>
+displayMkList = putStrLn "Enter filename:" >> 
+                    getLine >>= \mkFile -> (readFile mkFile) >>= \mkOp ->
+                        putStrLn "Enter Subject filename:" >> 
+                            getLine >>= \sbFile -> (readFile sbFile) >>= \sublist ->
+                                calcOptions mkOp sublist
+
+-- function to recurse through case
+calcOptions :: String -> String -> IO()
+calcOptions mksheetOp subOp = putStrLn "Enter 1 for avg Marks\nEnter 2 for Standard deviation\nEnter 3 to get Duplicate names\nEnter 4 to get Invalid scores in subjects\nEnter 5 for Students taking exam in a subject\nEnter 6 for Students that have taken same exams">>
+    getLine >>= \ch ->
+        let mkStr = formatMksheet mksheetOp
+            subjects = formatSub subOp
+        in case ((readMaybe ch)::Maybe Int) of
+                Just 1-> getSubAvg mkStr subjects
+                Just 2-> getStdDev mkStr subjects
+                Just 3-> getDuplicates mkStr subjects
+                Just 4-> getInvalidScores mkStr subjects
+                Just 5-> getStudentsInSubject mkStr subjects
+                Just 6-> getSubjectsInExam mkStr subjects
+                _-> putStrLn "Invalid Choice"
+            >> calcOptions mksheetOp subOp
+
+-- wrapper functions to which display formatted output
+getSubAvg :: MarkSheet -> [String] -> IO()
+getSubAvg mksheet subjects = putStrLn "Enter subjectName:" >>
     getLine >>= \subname-> if subname `elem` subjects
-        then putStrLn $ show (subAvg mksheetL subname)
-        else putStrLn "Invalid SubjectName" >> getSubAvg
+        then putStrLn $ show (subAvg mksheet subname subjects)
+        else putStrLn "Invalid SubjectName" >> getSubAvg mksheet subjects
 
-getStdDev :: IO()
-getStdDev = putStrLn "Enter subjectName:" >>
+getStdDev :: MarkSheet -> [String] -> IO()
+getStdDev mksheet subjects = putStrLn "Enter subjectName:" >>
     getLine >>= \subname-> if subname `elem` subjects
-        then putStrLn $ show (calculateSd mksheetL subname)
-        else putStrLn "Invalid SubjectName" >> getStdDev
+        then putStrLn $ show (calculateSd mksheet subname subjects)
+        else putStrLn "Invalid SubjectName" >> getStdDev mksheet subjects
 
-getDuplicates :: IO()
-getDuplicates = putStrLn (foldl' (\opStr nme -> opStr ++ nme ++ "\n") "" (duplicateNames mksheetL))
+getDuplicates :: MarkSheet -> [String] -> IO()
+getDuplicates mksheet subjects = putStrLn (foldl' (\opStr nme -> 
+    opStr ++ nme ++ "\n") "" (duplicateNames mksheet subjects))
 
-getInvalidScores :: IO()
-getInvalidScores = putStrLn (foldl' (\opstr (sname,list)-> 
+getInvalidScores :: MarkSheet -> [String] -> IO()
+getInvalidScores mksheet subjects = putStrLn (foldl' (\opstr (sname,list)-> 
     foldl' (\str (a,b,c,d)-> 
         str++sname++" | "++a++" | "++show b++" | "++show c++" | "++d++"\n") opstr list
-    ) "" (invalidScores mksheetL))
+    ) "" (invalidScores mksheet subjects))
 
-getStudentsInSubject :: IO()
-getStudentsInSubject = _todo
+getStudentsInSubject :: MarkSheet -> [String] -> IO()
+getStudentsInSubject mksheet subjects = putStrLn (foldl' (\opstr (sname,list)-> 
+    opstr ++"\n"++sname++" | " ++ foldl' (\str (studname)-> 
+        str++studname++" ") "" list
+    ) "" (studentsInSubject mksheet subjects))
 
-getSubjectsInExam :: IO()
-getSubjectsInExam = _todo
+getSubjectsInExam :: MarkSheet -> [String] -> IO()
+getSubjectsInExam mksheet subjects = putStrLn (foldl' (\opstr (subList,snameList)-> 
+        let subL = foldl' (\str (subname)-> 
+                str++subname++" | ") "" subList
+        in opstr ++"\n"++ subL ++ foldl' (\str (stname)-> 
+            str++stname++" ") "" snameList
+    ) "" (subjectsInExam mksheet subjects))
+
+--gets 1 record from string of mksheet
+mkSheetRec :: String -> (String,String,Integer,String)
+mkSheetRec fileStr =
+    let (name,str) = (break (==',') fileStr)
+        (subname,str1) = (break (==',') (tail str))
+        (mark,str2) = (break (==',') (tail str1))
+    in (name,subname,(read mark) :: Integer,
+        if str2 /= "" then tail str2 else "")
+
+--converts to marsheet format
+formatMksheet :: String -> MarkSheet
+formatMksheet str = fMksheet [] str
+    where fMksheet mksheet remStr = 
+            if remStr == ""
+                then mksheet
+            else
+                let (sname,subname,mark,remst) = mkSheetRec remStr
+                    (sn,sublist) = if mksheet == []
+                        then ("",[])
+                        else last mksheet
+                in if sn == sname
+                    then fMksheet ((init mksheet) ++ [(sn,sublist ++ [(subname,mark)])]) remst
+                    else fMksheet (mksheet ++ [(sname,[(subname,mark)])]) remst
+
+--gets subject csvs in list of strings
+formatSub :: String -> [String]
+formatSub subOp = fSub [] subOp
+    where fSub subs remstr = if remstr == ""
+            then subs
+            else
+                let (subname,nxt) = (break (==',') remstr)
+                    nxtrecord = if nxt== "" then "" else tail nxt
+                in fSub (subs ++ [subname]) nxtrecord
