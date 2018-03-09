@@ -6,7 +6,7 @@ import Text.Read
 
 encode :: Int -> String -> String
 encode n str =  let numL = [1..n] ++ (reverse [2..(n-1)])
-                    cycList = cycle numL
+                    cycList = take (length str) (cycle numL)
                     filteredStr = filter (/=' ') str
                     pairList = zip cycList filteredStr
                     sortL = sortBy (comparing fst) pairList
