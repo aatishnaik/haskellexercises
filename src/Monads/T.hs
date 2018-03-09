@@ -11,5 +11,9 @@ getL = fmap (\str -> if str == "yes" then "Yes" else "No"
 testEither :: Int -> Either String Int
 testEither num = if num > 18 then Right 18 else Left "enter proper age"
 
---getLn :: IO()
-getLn = getLine >>= \code -> code
+
+
+getLn :: IO()
+getLn = do 
+        code <- getLine
+        putStrLn code
