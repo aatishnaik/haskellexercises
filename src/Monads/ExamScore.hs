@@ -1,6 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Monads.ExamScore where
 import Data.List
+import Data.List.Split
 import Text.Read
 type StudentName = String
 type SubjectName = String
@@ -161,18 +162,18 @@ mkSheetRec fileStr =
 
 --converts to marsheet format
 formatMksheet :: String -> MarkSheet
-formatMksheet str = fMksheet [] str
-    where fMksheet mksheet remStr = 
-            if remStr == ""
-                then mksheet
-            else
-                let (sname,subname,mark,remst) = mkSheetRec remStr
-                    (sn,sublist) = if mksheet == []
-                        then ("",[])
-                        else last mksheet
-                in if sn == sname
-                    then fMksheet ((init mksheet) ++ [(sn,sublist ++ [(subname,mark)])]) remst
-                    else fMksheet (mksheet ++ [(sname,[(subname,mark)])]) remst
+formatMksheet str = 
+    let lineStr = splitOn "\n" str
+        recStr = map (\s -> splitOn "," s) lineStr
+    in foldl' (\msheet (sname:subname:mark:[])-> case ((readMaybe mark) :: Maybe Integer) of
+                    Just mk -> if msheet==[]
+                        then msheet++[(sname,[(subname,mk)])]
+                        else let (sn,mkl) = last msheet
+                            in if sn==sname 
+                                    then (init msheet)++[(sname,mkl++[(subname,mk)])]
+                                    else msheet ++ [(sname,mkl++[(subname,mk)])]
+                    Nothing -> error "Marks not in number"
+        ) [] recStr
 
 --gets subject csvs in list of strings
 formatSub :: String -> [String]

@@ -1,6 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Monads.ExamScore where
 import Data.List
+import Data.List.Split
 import Text.Read
 type StudentName = String
 type SubjectName = String
@@ -86,60 +87,79 @@ subjectsInExam  marksheet subjects=
         emptylist = map (\(x,y) -> ([x],y)) emptyele
         newlist = zip newname newsub
     in newlist ++ emptylist
-
+    - main display function
+    displayMkList :: IO()
+    displayMkList = putStrLn "Enter filename:" >> 
+                        getLine >>= \mkFile -> (readFile mkFile) >>= \mkOp ->
+                            putStrLn "Enter Subject filename:" >> 
+                                getLine >>= \sbFile -> (readFile sbFile) >>= \sublist ->
+                                    calcOptions mkOp sublist
+    
+    -- function to recurse through case
+    calcOptions :: String -> String -> IO()
+    calcOptions mksheetOp subOp = putStrLn "Enter 1 for avg Marks\nEnter 2 for Standard deviation\nEnter 3 to get Duplicate names\nEnter 4 to get Invalid scores in subjects\nEnter 5 for Students taking exam in a subject\nEnter 6 for Students that have taken same exams">>
+        getLine >>= \ch ->
+            let mkStrn = wrapfMksheet mksheetOp
+                subjects = formatSub subOp
+            in case mkStrn of
+                    Right mkStr->
+                        do
+                            case ((readMaybe ch)::Maybe Int) of
+                                Just 1-> getSubAvg mkStr subjects
+                                Just 2-> getStdDev mkStr subjects
+                                Just 3-> getDuplicates mkStr subjects
+                                Just 4-> getInvalidScores mkStr subjects
+                                Just 5-> getStudentsInSubject mkStr subjects
+                                Just 6-> getSubjectsInExam mkStr subjects
+                                _-> putStrLn "Invalid Choice"
+                            calcOptions mksheetOp subOp
+                    Left err -> do
+                        putStrLn err
+                        displayMkList
 -- Monads part starts here
 
 -- main display function
 displayMkList :: IO()
-displayMkList = 
-    do
-        putStrLn "Enter filename:"
-        mkFile <- getLine
-        mkOp <-readFile mkFile
-        putStrLn "Enter Subject filename:"
-        sbFile<-getLine
-        sublist<-readFile sbFile
-        calcOptions mkOp sublist
+displayMkList = putStrLn "Enter filename:" >> 
+                    getLine >>= \mkFile -> (readFile mkFile) >>= \mkOp ->
+                        putStrLn "Enter Subject filename:" >> 
+                            getLine >>= \sbFile -> (readFile sbFile) >>= \sublist ->
+                                calcOptions mkOp sublist
 
 -- function to recurse through case
 calcOptions :: String -> String -> IO()
-calcOptions mksheetOp subOp = 
-    do
-    putStrLn "Enter 1 for avg Marks\nEnter 2 for Standard deviation\nEnter 3 to get Duplicate names\nEnter 4 to get Invalid scores in subjects\nEnter 5 for Students taking exam in a subject\nEnter 6 for Students that have taken same exams"
-    ch<-getLine
-    let mkStrn = formatMksheet mksheetOp
-        subjects = formatSub subOp
-    case mkStrn of
-        Right mkStr->
-            case ((readMaybe ch)::Maybe Int) of
-                        Just 1-> getSubAvg mkStr subjects
-                        Just 2-> getStdDev mkStr subjects
-                        Just 3-> getDuplicates mkStr subjects
-                        Just 4-> getInvalidScores mkStr subjects
-                        Just 5-> getStudentsInSubject mkStr subjects
-                        Just 6-> getSubjectsInExam mkStr subjects
-                        _-> putStrLn "Invalid Choice"
-        Left mkStrn-> putStrLn mkStrn
-    calcOptions mksheetOp subOp
+calcOptions mksheetOp subOp = putStrLn "Enter 1 for avg Marks\nEnter 2 for Standard deviation\nEnter 3 to get Duplicate names\nEnter 4 to get Invalid scores in subjects\nEnter 5 for Students taking exam in a subject\nEnter 6 for Students that have taken same exams">>
+    getLine >>= \ch ->
+        let mkStrn = wrapfMksheet mksheetOp
+            subjects = formatSub subOp
+        in case mkStrn of
+                Right mkStr->
+                    do
+                        case ((readMaybe ch)::Maybe Int) of
+                            Just 1-> getSubAvg mkStr subjects
+                            Just 2-> getStdDev mkStr subjects
+                            Just 3-> getDuplicates mkStr subjects
+                            Just 4-> getInvalidScores mkStr subjects
+                            Just 5-> getStudentsInSubject mkStr subjects
+                            Just 6-> getSubjectsInExam mkStr subjects
+                            _-> putStrLn "Invalid Choice"
+                        calcOptions mksheetOp subOp
+                Left err -> do
+                    putStrLn err
+                    displayMkList
 
 -- wrapper functions to which display formatted output
 getSubAvg :: MarkSheet -> [String] -> IO()
-getSubAvg mksheet subjects = 
-    do
-    putStrLn "Enter subjectName:"
-    subname<-getLine
-    if subname `elem` subjects
-    then putStrLn $ show (subAvg mksheet subname subjects)
-    else putStrLn "Invalid SubjectName" >> getSubAvg mksheet subjects
+getSubAvg mksheet subjects = putStrLn "Enter subjectName:" >>
+    getLine >>= \subname-> if subname `elem` subjects
+        then putStrLn $ show (subAvg mksheet subname subjects)
+        else putStrLn "Invalid SubjectName" >> getSubAvg mksheet subjects
 
 getStdDev :: MarkSheet -> [String] -> IO()
-getStdDev mksheet subjects = 
-    do
-    putStrLn "Enter subjectName:"
-    subname<-getLine
-    if subname `elem` subjects
-    then putStrLn $ show (calculateSd mksheet subname subjects)
-    else putStrLn "Invalid SubjectName" >> getStdDev mksheet subjects
+getStdDev mksheet subjects = putStrLn "Enter subjectName:" >>
+    getLine >>= \subname-> if subname `elem` subjects
+        then putStrLn $ show (calculateSd mksheet subname subjects)
+        else putStrLn "Invalid SubjectName" >> getStdDev mksheet subjects
 
 getDuplicates :: MarkSheet -> [String] -> IO()
 getDuplicates mksheet subjects = putStrLn (foldl' (\opStr nme -> 
@@ -166,22 +186,67 @@ getSubjectsInExam mksheet subjects = putStrLn (foldl' (\opstr (subList,snameList
     ) "" (subjectsInExam mksheet subjects))
 
 --converts to marsheet format
-formatMksheet :: String -> MarkSheet
-formatMksheet str = fMksheet 0 [] str
-    where fMksheet flag mksheet remStr = 
-            if remStr == ""
+{-formatMksheet :: String -> Either String MarkSheet
+formatMksheet str = let
+    mkFuncOp=(fMksheet [] str)
+    (fl,_)=last mkFuncOp
+    in if fl == "valid"
+        then Left fl
+        else Right (map (\(_,ms)->ms) mkFuncOp)
+        where 
+            fMksheet :: [(String,(String,[(String,Integer)]))] -> String -> [(String,(String,[(String,Integer)]))]
+            fMksheet mksheet remStr = 
+                if remStr == ""
                 then mksheet
-            else
-                let (mkRecord,remst)=break (=='\n') remStr
-                    (sname,subremStr) = break (==',') mkRecord
-                    (subname,mkremStr)= break (==',') (tail subremStr)
-                    mark = (readMaybe (tail mkremStr)) :: Maybe Integer 
-                    (sn,sublist) = if mksheet == []
-                        then ("",[])
-                        else last mksheet
-                in if sn == sname
-                    then fMksheet 0 ((init mksheet) ++ [(sn,sublist ++ [(subname,mark)])]) (tail remst)
-                    else fMksheet 0 (mksheet ++ [(sname,[(subname,mark)])]) (tail remst)
+                else
+                    let (mkRecord,remst)=break (=='\n') remStr
+                        (sname,subremStr) = break (==',') mkRecord
+                        (subname,mkremStr)= break (==',') (tail subremStr)
+                        marks = (readMaybe (tail mkremStr)) :: Maybe Integer
+                        mark = case marks of
+                            Just val -> val
+                            Nothing -> -1
+                        flag =
+                            case marks of
+                                Just _ -> if (sname=="")
+                                    then "studentname not proper"
+                                    else if (subname=="")
+                                    then "subject name not proper"
+                                    else "valid" 
+                                Nothing -> "marks not proper"
+                        (_,(sn,sublist)) = if mksheet == []
+                            then ("valid",("",[]))
+                            else last mksheet
+                        
+                    in case flag of
+                        "valid" -> if sn == sname
+                            then fMksheet ((init mksheet) ++ [(flag,(sn,sublist ++ [(subname,mark)]))]) (tail remst)
+                            else fMksheet (mksheet ++ [(flag,(sname,[(subname,mark)]))]) (tail remst)
+                        _->[(flag,("",[]))]-}
+
+formatMksheet :: String -> (String,MarkSheet)
+formatMksheet str = 
+    let lineStr = splitOn "\n" str
+        recStr = map (\s -> splitOn "," s) lineStr
+    in foldl' (\(fl,msheet) recrd->
+            case recrd of
+                (sname:subname:mark:[])-> case ((readMaybe mark) :: Maybe Integer) of
+                    Just mk -> if msheet==[]
+                        then (fl,msheet++[(sname,[(subname,mk)])])
+                        else (fl,
+                                let (sn,mkl) = last msheet
+                                in if sn==sname 
+                                    then (init msheet)++[(sname,mkl++[(subname,mk)])]
+                                    else msheet ++ [(sname,mkl++[(subname,mk)])]
+                            )
+                    Nothing -> ("Marks not in Integer form",[])
+                _-> ("Marksheet not in proper form",[])
+        ) ("valid",[]) recStr
+
+wrapfMksheet :: String -> Either String MarkSheet
+wrapfMksheet str = 
+    let (fl,mkStr) = formatMksheet str
+    in if fl=="valid" then Right mkStr else Left fl
 
 --gets subject csvs in list of strings
 formatSub :: String -> [String]
