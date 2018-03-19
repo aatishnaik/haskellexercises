@@ -23,6 +23,12 @@ dependencies:
 - base >= 4.7 && < 5
 - containers
 - split
+- text
+- cassava
+- bytestring
+- vector
+- lens
+- wreq
 
 library:
   source-dirs: src
