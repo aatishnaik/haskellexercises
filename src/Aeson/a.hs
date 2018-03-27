@@ -40,7 +40,7 @@ test =do
             opts = defaults & auth ?~ auth1
          in 
             do
-                r <- getWith opts "https://api.twitter.com/1.1/followers/ids.json?screen_name=StanleyFloFer%20"
+                r <- getWith opts "https://api.twitter.com/1.1/followers/ids.json?screen_name=aatishVL"
                 return $ r^. responseBody 
 
 test123 =
