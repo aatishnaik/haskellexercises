@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 module TestTweet where
 import Control.Lens
 import Data.Aeson as DA
 import Network.Wreq
---import GHC.Generics
+import GHC.Generics
 import qualified Data.ByteString.Char8 as DB
 import qualified Data.ByteString.Lazy as BL
 import Data.Map as Map
@@ -12,8 +13,8 @@ resUrl :: String
 resUrl = "https://api.twitter.com/1.1/followers/list.json?cursor=-1&screen_name=aatishVL&skip_status=true&include_user_entities=false"
 
 data Users = Users {
-    id :: Integer--,
-    {-id_str :: String,
+    id :: Integer,
+    id_str :: String,
     name :: String ,
     screen_name :: String,
     location :: String,
@@ -51,14 +52,14 @@ data Users = Users {
     following :: Bool,
     follow_request_sent :: Bool,
     notifications :: Bool,
-    muting :: Bool-}
-}deriving (Show)
+    muting :: Bool
+}deriving (Show,Eq,Generic)
 
 instance FromJSON Users where
     parseJSON (Object v) = 
         do
         uid <- v .: "id"
-        {-uid_str <- v .: "id_str"
+        uid_str <- v .: "id_str"
         uname <- v .: "name"
         uscreen_name <- v .: "screen_name"
         ulocation <- v .: "location"
@@ -96,10 +97,10 @@ instance FromJSON Users where
         ufollowing <- v .: "following"
         ufollow_request_sent <- v .: "follow_request_sent"
         unotifications <- v .: "notifications"
-        umuting <- v .: "muting"-}
+        umuting <- v .: "muting"
         pure Users {
-            id=uid--,
-            {-id_str=uid_str,
+            id=uid,
+            id_str=uid_str,
             name=uname,
             screen_name=uscreen_name,
             location=ulocation,
@@ -137,26 +138,26 @@ instance FromJSON Users where
             following=ufollowing,
             follow_request_sent=ufollow_request_sent,
             notifications=unotifications,
-            muting=umuting-}
+            muting=umuting
         }
 
 data UserList = UserList {
-    {-userList :: Users,-}
+    userList :: [Users],
     next_cursor :: Integer,
-    --next_cursor_str::String,
-    previous_cursor::Integer--,
-    --previous_cursor_str::String
-}deriving (Show)
+    next_cursor_str::String,
+    previous_cursor::Integer,
+    previous_cursor_str::String
+}deriving (Show,Eq,Generic)
 
 instance FromJSON UserList where
     parseJSON (Object v) = 
         do
-            {-userlst <- v .: "users"-}
+            userlst <- v .: "users"
             nxtcur <- v .: "next_cursor"
-            --snxtcur <- v .: "next_cursor_str"
+            snxtcur <- v .: "next_cursor_str"
             precur <- v .: "previous_cursor"
-            --sprecur <- v .: "previous_cursor_str"
-            pure (UserList {{-userList = userlst,-}next_cursor=nxtcur,{-next_cursor_str=snxtcur,-}previous_cursor=precur{-,previous_cursor_str=sprecur-}})
+            sprecur <- v .: "previous_cursor_str"
+            pure (UserList {userList = userlst,next_cursor=nxtcur,next_cursor_str=snxtcur,previous_cursor=precur,previous_cursor_str=sprecur})
 
 --getDecode :: IO (Response BL.ByteString) -> IO ()
 --getDecode :: FromJSON a => IO (Response BL.ByteString) -> IO (Either String a)
