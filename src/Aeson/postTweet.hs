@@ -159,7 +159,7 @@ instance FromJSON UserList where
             pure (UserList {{-userList = userlst,-}next_cursor=nxtcur,{-next_cursor_str=snxtcur,-}previous_cursor=precur{-,previous_cursor_str=sprecur-}})
 
 --getDecode :: IO (Response BL.ByteString) -> IO ()
-getDecode :: FromJSON a => IO (Response BL.ByteString) -> IO (Either String a)
+--getDecode :: FromJSON a => IO (Response BL.ByteString) -> IO (Either String a)
 getDecode str =
     str >>= \content -> pure (DA.eitherDecode (content ^. responseBody))
 --        case (decode (content ^. responseBody)) of
