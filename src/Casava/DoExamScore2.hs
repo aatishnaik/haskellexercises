@@ -13,13 +13,24 @@ type SubjectMarks = Integer
 type MarkSheet = [(String,[(String,Integer)])]
 
 data EScore = EScore
-    { studname   :: !String
-    , subname   :: !String
-    , marks :: !Int
+    { studname   :: String
+    , subname   :: String
+    , marks :: Int
     }
 
+{-
+--applicative parser
 instance FromNamedRecord EScore where
     parseNamedRecord r = EScore <$> r .: (DB.pack "Studname") <*> r .: (DB.pack "Subname") <*> r .: (DB.pack "Marks")
+-}
+instance FromNamedRecord EScore where
+    --parseNamedRecord :: NamedRecord -> Parser EScore
+    parseNamedRecord r =
+        do
+            studName <- DC.lookup r (DB.pack "Studname") :: Parser String
+            subName <- DC.lookup r (DB.pack "Subname") :: Parser String
+            subMarks <- DC.lookup r (DB.pack "Marks") :: Parser Int
+            pure $ EScore { studname=studName,subname=subName,marks=subMarks }
 
 --Part 1
 foldScore :: (b -> (StudentName,Bool,[(SubjectName,SubjectMarks, Bool, String)]) -> b) -> b -> MarkSheet -> [String] -> b
@@ -68,6 +79,7 @@ invalidScores :: MarkSheet -> [String] -> [(StudentName,[(SubjectName,SubjectMar
 invalidScores marksheet subjects=
     let subs = foldScore (\arr (stuname,_,scorelist) -> arr ++ [(stuname,(DL.filter (\(_,_,flag,_)-> flag==False)) scorelist)]) [] marksheet subjects
     in subs
+
 --Part2
 studentsInSubject :: MarkSheet -> [String] -> [(SubjectName,[StudentName])]
 studentsInSubject marksheet subjects= 
@@ -78,7 +90,7 @@ studentsInSubject marksheet subjects=
                     else arr
                 else arr)
                 ) ini marksheet subjects)) iv
-    
+
 subjectsInExam :: MarkSheet -> [String] -> [([SubjectName],[StudentName])]
 subjectsInExam  marksheet subjects=
     let namelist = foldScore (\arr (sname,k,scorelist)-> if k

@@ -29,6 +29,11 @@ dependencies:
 - vector
 - lens
 - wreq
+- aeson
+- twitter-conduit
+- conduit
+- twitter-types-lens
+- http-types
 
 library:
   source-dirs: src
