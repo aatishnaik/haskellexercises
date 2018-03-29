@@ -83,7 +83,7 @@ checkFollowers :: [String] -> [String] -> ([String],String)
 checkFollowers ufList fList = 
     let
         fol = ufList `intersect` fList
-        ufol = DL.foldl' (\arr f-> if(f `notElem` ufList) then arr++f++" " else arr) "" ufList
+        ufol = DL.foldl' (\arr f-> if(f `notElem` fList) then arr++f++" " else arr) "" ufList
     in (fol,ufol)
 
 getUnfollowerIds :: (Either String FollowerList) -> [String] -> [Integer]
