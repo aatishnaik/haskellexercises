@@ -79,11 +79,11 @@ getIds fList =
         id=usrid,name=_,screen_name=_,followers_count=_
     } -> usrid) follArr
 
-checkFollowers :: [String] -> [String] -> ([String],[String])
+checkFollowers :: [String] -> [String] -> ([String],String)
 checkFollowers ufList fList = 
     let
         fol = ufList `intersect` fList
-        ufol = DL.foldl' (\arr f-> if(f `notElem` ufList) then arr++[f] else arr) [] fol
+        ufol = DL.foldl' (\arr f-> if(f `notElem` ufList) then arr++f++" " else arr) "" ufList
     in (fol,ufol)
 
 getUnfollowerIds :: (Either String FollowerList) -> [String] -> [Integer]
@@ -101,7 +101,6 @@ followOfFollowers =
         fOfF >>= \fof -> fof (DL.map () fList)-}
         --pure $ foldl' (\arr nme -> arr ++ [getFollowers nme]) [] fList
         --fofFList <- 
-
 --unfollowFollowers :: [String] -> String ->
 {-unfollowFollowers ufList =
     do
@@ -110,20 +109,36 @@ followOfFollowers =
         filterFollowers <- pure (checkFollowers ufList fList)
         unfollowed <- _todo
         putStrLn unfollowed ++ "\nUnable to Unfollow "++(snd filterFollowers) -}
-
 {-unfollowUsers usrIds =
     let
         urlRes = resUnfollow ++ "?user_id=" ++ (show (head usrIds))
     in postWith authenticator (resunfollow++"?user_id=52544275") (Follower{id = 52544275, name = "Ivanka Trump", screen_name = "IvankaTrump", followers_count= 5526295})
 -}
 
-unfollowUserList =
+getUserList :: IO([String])
+getUserList =
     do
-    putStrLn "Enter a delimiter char:"
-    delimiter <-getLine
-    putStrLn "Enter User ScreenName list seperated by delimiter:"
-    userList<-getLine
-    let 
-        list = map (\c-> if c == (head delimiter) then ' ' else c) userList
-        userSet = words list
-    putStrLn (foldl' (\arr x -> arr++" "++x) "" userSet)
+        putStrLn "Enter a delimiter char:"
+        delimiter <-getLine
+        putStrLn "Enter User ScreenName list seperated by delimiter:"
+        userList<-getLine
+        pure $ words (map (\c-> if c == (head delimiter) then ' ' else c) userList)
+
+{-unfollowUserList =
+    do
+    followers <- getFollowers "aatishVL"
+    usrs <- getUserList
+    validUsers <- checkFollowers usrs (getScrNames followers)
+    UnfollowId = 
+    pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++u) (DB.pack "sdsd")) userSet)
+-}
+
+--unfollowUserList :: IO [IO (Response BL.ByteString)]
+unfollowUserList =
+    let
+        followers = getFollowers "aatishVL"
+        usrs = getUserList
+        validUsers = followers >>= \f -> usrs >>= \us -> pure $ checkFollowers us (getScrNames f)
+    in followers >>= \f -> validUsers >>= \us -> putStrLn (DL.foldl' (\arr x -> arr ++" "++(show x)) (snd us) (getUnfollowerIds f (fst us)))
+        --unfollowIds = followers >>= \f -> validUsers >>= \us -> pure (getUnfollowerIds f (fst us))
+    --in unfollowIds >>= \usrSets -> pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "sdsd")) usrSets
