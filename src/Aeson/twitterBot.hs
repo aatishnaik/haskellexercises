@@ -6,7 +6,6 @@ import Control.Monad as CM
 import Control.Lens
 import Data.Aeson as DA
 import Network.Wreq as NW
-import Network.Wreq.Types as T
 import GHC.Generics
 import qualified Data.ByteString.Char8 as DB
 import qualified Data.ByteString.Lazy as BL
@@ -134,13 +133,24 @@ getUserList =
     pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++u) (DB.pack "sdsd")) userSet)
 -}
 
-unfollowUserList :: IO ()
+--unfollowUserList :: IO ()
 unfollowUserList =
     let
         followers = getFollowers "aatishVL"
         usrs = getUserList
+    in followers >>= \f -> 
+        usrs >>= \us -> 
+            do
+            (validUsers,invalidUsers) <- pure $ checkFollowers us (getScrNames f)
+            unfollowIds <- pure (getUnfollowerIds f validUsers)
+            ufStr <- pure ("\nUnable to Unfollow : "++invalidUsers)
+            CM.mapM (\u -> (postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT"))) unfollowIds
+--            BL.putStrLn unfolUsers
+{-
         validUsers = followers >>= \f -> usrs >>= \us -> pure $ checkFollowers us (getScrNames f)
         unfollowIds = followers >>= \f -> validUsers >>= \us -> pure (getUnfollowerIds f (fst us))
-    in unfollowIds >>= \usrSets -> 
-        CM.mapM (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT")) usrSets
-        >> (validUsers >>= \vu -> putStrLn ("\nUnable to Unfollow : "++(snd vu)))
+        ufStr = validUsers >>= \vu -> pure ("\nUnable to Unfollow : "++(snd vu))
+        unfolUsers = unfollowIds >>= \usrSets -> CM.mapM (\u -> (postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT"))) usrSets
+    in do
+        us <- ufStr
+        unfolUsers >> putStrLn us-}
