@@ -134,7 +134,7 @@ getUserList =
     pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++u) (DB.pack "sdsd")) userSet)
 -}
 
---unfollowUserList :: IO [IO (Response BL.ByteString)]
+unfollowUserList :: IO ()
 unfollowUserList =
     let
         followers = getFollowers "aatishVL"
