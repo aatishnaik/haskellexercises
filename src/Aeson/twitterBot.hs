@@ -8,7 +8,7 @@ import Data.Aeson as DA
 import Network.Wreq as NW
 import GHC.Generics
 import qualified Data.ByteString.Char8 as DB
-import qualified Data.ByteString.Lazy as BL
+--import qualified Data.ByteString.Lazy as BL
 import Prelude hiding (id)
 
 resGetFollowers :: String
@@ -83,7 +83,7 @@ checkFollowers :: [String] -> [String] -> ([String],String)
 checkFollowers ufList fList = 
     let
         fol = ufList `intersect` fList
-        ufol = DL.foldl' (\arr f-> if(f `notElem` fList) then arr++f++" " else arr) "" ufList
+        ufol = DL.foldl' (\arr f-> if(f `notElem` fList) then arr++" "++f else arr) "" ufList
     in (fol,ufol)
 
 getUnfollowerIds :: (Either String FollowerList) -> [String] -> [Integer]
@@ -92,6 +92,7 @@ getUnfollowerIds fList ufList=
     in DL.foldl' (\arr Follower{
         id=usrid,name=_,screen_name=scrName,followers_count=_
     } -> if (scrName `elem` ufList) then arr++[usrid] else arr) [] follArr
+
 {-followOfFollowers :: IO [IO [String]]
 followOfFollowers =
     do
@@ -133,7 +134,7 @@ getUserList =
     pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++u) (DB.pack "sdsd")) userSet)
 -}
 
---unfollowUserList :: IO ()
+unfollowUserList :: IO ()
 unfollowUserList =
     let
         followers = getFollowers "aatishVL"
@@ -144,7 +145,7 @@ unfollowUserList =
             (validUsers,invalidUsers) <- pure $ checkFollowers us (getScrNames f)
             unfollowIds <- pure (getUnfollowerIds f validUsers)
             ufStr <- pure ("\nUnable to Unfollow : "++invalidUsers)
-            CM.mapM (\u -> (postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT"))) unfollowIds
+            CM.mapM (\u -> (postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT"))) unfollowIds >> putStrLn ufStr
 --            BL.putStrLn unfolUsers
 {-
         validUsers = followers >>= \f -> usrs >>= \us -> pure $ checkFollowers us (getScrNames f)
