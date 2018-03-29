@@ -139,6 +139,6 @@ unfollowUserList =
         followers = getFollowers "aatishVL"
         usrs = getUserList
         validUsers = followers >>= \f -> usrs >>= \us -> pure $ checkFollowers us (getScrNames f)
-    in followers >>= \f -> validUsers >>= \us -> putStrLn (DL.foldl' (\arr x -> arr ++" "++(show x)) (snd us) (getUnfollowerIds f (fst us)))
-        --unfollowIds = followers >>= \f -> validUsers >>= \us -> pure (getUnfollowerIds f (fst us))
-    --in unfollowIds >>= \usrSets -> pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "sdsd")) usrSets
+    --in followers >>= \f -> validUsers >>= \us -> putStrLn (DL.foldl' (\arr x -> arr ++" "++(show x)) (snd us) (getUnfollowerIds f (fst us)))
+        unfollowIds = followers >>= \f -> validUsers >>= \us -> pure (getUnfollowerIds f (fst us))
+    in unfollowIds >>= \usrSets -> pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "sdsd")) usrSets
