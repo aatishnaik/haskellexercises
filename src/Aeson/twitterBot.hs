@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Aeson.TwitterBot where
 import Data.List as DL
+import Control.Monad as CM
 import Control.Lens
 import Data.Aeson as DA
 import Network.Wreq as NW
@@ -139,6 +140,7 @@ unfollowUserList =
         followers = getFollowers "aatishVL"
         usrs = getUserList
         validUsers = followers >>= \f -> usrs >>= \us -> pure $ checkFollowers us (getScrNames f)
-    --in followers >>= \f -> validUsers >>= \us -> putStrLn (DL.foldl' (\arr x -> arr ++" "++(show x)) (snd us) (getUnfollowerIds f (fst us)))
         unfollowIds = followers >>= \f -> validUsers >>= \us -> pure (getUnfollowerIds f (fst us))
-    in unfollowIds >>= \usrSets -> pure $ DL.map (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "sdsd")) usrSets
+    in unfollowIds >>= \usrSets -> 
+        CM.mapM (\u -> postWith authenticator (resunfollow++"?user_id="++(show u)) (DB.pack "SAMPLE TEXT")) usrSets
+        >> (validUsers >>= \vu -> putStrLn ("\nUnable to Unfollow : "++(snd vu)))
