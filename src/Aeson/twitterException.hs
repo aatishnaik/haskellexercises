@@ -136,7 +136,7 @@ checkScrName userName =
     in userData >>= \udata -> 
         case udata of
             Right val -> pure (val ^. responseStatus ^. statusCode)
-            Left err -> pure 403
+            Left _ -> pure 403
 
 twitterBot :: IO()
 twitterBot =
