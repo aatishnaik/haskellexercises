@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
-module Aeson.TwitterBot where
+module Aeson.TwitterException where
 import Data.List as DL
 import Control.Monad as CM
 import Control.Lens
@@ -9,7 +9,9 @@ import Network.Wreq as NW
 import Text.Read as TR
 import GHC.Generics
 import qualified Data.ByteString.Char8 as DB
+import qualified Data.ByteString.Lazy as BL
 import Prelude hiding (id)
+import Control.Exception
 
 resGetFollowers :: String
 resGetFollowers = "https://api.twitter.com/1.1/friends/list.json"
@@ -60,8 +62,9 @@ authenticator :: Options
 authenticator =
     let 
         authKey = oauth1Auth (DB.pack "FaPdykltzoxz65Tf9TH9ugIe4") (DB.pack "4yxJAXPQMQinymZI6CDgWNhMdLAT68zjucqvlpNeS7glDvSEtc") (DB.pack "976334890915397632-DpsHhYJiTKkQY7ip48JFcqK86xbrsBP") (DB.pack "a6C63vZ8sQmFFgQjm1KnRy4VYPKwRy1dfNcFb5nxliYMH")
-        def = set NW.checkResponse (Just $ \_ _ -> return ()) defaults
-        opt = def & NW.auth ?~ authKey
+        --def = set NW.checkResponse (Just $ \_ _ -> return ()) defaults
+        --opt = def & NW.auth ?~ authKey
+        opt = defaults & NW.auth ?~ authKey
     in opt
 
 getFollowers :: String -> IO (Either String FollowerList)
@@ -129,8 +132,11 @@ followUserList =
 checkScrName :: String -> IO (Int)
 checkScrName userName =
     let urlStr = resverify++"?screen_name="++userName
-        userData = getWith authenticator urlStr
-    in userData >>= \udata -> pure (udata ^. responseStatus ^. statusCode)
+        userData = try (getWith authenticator urlStr) :: IO (Either SomeException (Response BL.ByteString))
+    in userData >>= \udata -> 
+        case udata of
+            Right val -> pure (val ^. responseStatus ^. statusCode)
+            Left err -> pure 403
 
 twitterBot :: IO()
 twitterBot =
