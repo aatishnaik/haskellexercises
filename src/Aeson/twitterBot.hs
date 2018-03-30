@@ -140,5 +140,6 @@ twitterBot =
         case ((readMaybe ch)::Maybe Int) of
             Just 1 -> unfollowUserList
             Just 2 -> followUserList
-            _ -> putStrLn "Invalid choice"
-        twitterBot
+
+            _ -> putStrLn "Invalid choice" >> twitterBot
+        
