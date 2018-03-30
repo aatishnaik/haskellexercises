@@ -122,21 +122,24 @@ followUserList =
         usrs <- getUserList
         (iUsers,vUsers) <- pure $ checkFollowers usrs (getScrNames f)
         validUsers <- CM.foldM (\arr u -> checkScrName u >>= \sc ->
-            if sc == 200 
-                then pure (arr++[u]) 
-                else pure arr
+            case sc of
+                Right val -> if (val ^. responseStatus ^. statusCode)==200
+                    then pure (arr++[u])
+                    else pure arr
+                Left _ -> pure arr
             ) [] (words vUsers)
         CM.mapM (\u -> (postWith authenticator (resfollow++"?screen_name="++u++"&follow=true") (DB.pack "SAMPLE TEXT"))) validUsers 
-            >> putStrLn ((foldl' (\arr u-> arr++" "++u) "" iUsers)++" Are already being followed")
+            >> putStrLn ("Are already being followed:"++(foldl' (\arr u-> arr++" "++u) "" iUsers)
+            ++"\nNow following:"++(foldl' (\arr u-> arr++" "++u) "" validUsers))
 
-checkScrName :: String -> IO (Int)
+checkScrName :: String -> IO (Either SomeException (Response BL.ByteString))--IO (Int)
 checkScrName userName =
     let urlStr = resverify++"?screen_name="++userName
-        userData = try (getWith authenticator urlStr) :: IO (Either SomeException (Response BL.ByteString))
-    in userData >>= \udata -> 
+        userData = try (getWith authenticator urlStr) -- :: IO (Either SomeException (Response BL.ByteString))
+    in userData {->>= \udata -> 
         case udata of
             Right val -> pure (val ^. responseStatus ^. statusCode)
-            Left _ -> pure 403
+            Left _ -> pure 403-}
 
 twitterBot :: IO()
 twitterBot =
