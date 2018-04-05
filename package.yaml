@@ -38,6 +38,9 @@ dependencies:
 - filepath
 - mtl
 - string-conv
+- transformers
+- monad-control
+- either
 
 library:
   source-dirs: src
