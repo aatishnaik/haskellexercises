@@ -41,6 +41,7 @@ dependencies:
 - transformers
 - monad-control
 - either
+- postgresql-simple
 
 library:
   source-dirs: src

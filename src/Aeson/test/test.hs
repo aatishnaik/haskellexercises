@@ -134,9 +134,24 @@ runMyApp k maxDepth =
   in runStateT (runReaderT (runA k) config) state-}
 
 --runMyApp (MyA $ constrainedCount 0 ".") 4
-module Test where
+{-module Test where
+import Control.Monad.Readertype Config = FilePath
+
+load :: (MonadReader Config m, MonadIO m) => String -> m String
+load x = do
+    config <- ask
+    liftIO $ readFile (config ++ x)
+
+loadRevision :: (MonadReader Config m, MonadIO m) => Int -> m String
+loadRevision x = load ("history" ++ show x ++ ".txt")
+
+loadAll :: (MonadReader Config m, MonadIO m) => Int -> String -> m (String, String)
+loadAll x y = do
+    a <- load y
+    b <- loadRevision x
+    return (a, b)
+-}
 import Control.Monad.Reader
-import Control.Monad.Writer
 import qualified Data.Map.Lazy as M
 
 type Config = M.Map String String
