@@ -42,6 +42,7 @@ dependencies:
 - monad-control
 - either
 - postgresql-simple
+- time
 
 library:
   source-dirs: src
