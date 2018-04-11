@@ -63,11 +63,12 @@ setCustomer = do
     putStr "Enter Phone: "
     ph <- getLine
     putStr "Enter ClientId: "
-    cid <- getLine
+    cliid <- getLine
     putStr "Enter No of Bookings: "
-    nob <- getLine
-    pure Customer{custId=CustomerId Nothing,custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=(read cid):: Integer,custnBook=(read nob):: Integer,custCreatedAt=(read "2018-04-09 17:21:49.921882" :: LocalTime),custUpdatedAt=(read "2018-04-09 17:21:49.921882" :: LocalTime)}
-
+    noob <- getLine
+    case (readMaybe cliid :: Maybe Integer,readMaybe noob :: Maybe Integer)of
+        (Just cid,Just nob) -> pure Customer{custId=CustomerId Nothing,custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=cid,custnBook=nob,custCreatedAt=(read "2018-04-09 17:21:49.921882" :: LocalTime),custUpdatedAt=(read "2018-04-09 17:21:49.921882" :: LocalTime)}
+        _ -> error "Invalid Data"
 setCustId :: Integer -> Customer -> IO Customer
 setCustId i Customer{custId=_,custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=cid,custnBook=nob,custCreatedAt=ca,custUpdatedAt=ua} = pure Customer{custId=CustomerId (Just i),custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=cid,custnBook=nob,custCreatedAt=ca,custUpdatedAt=ua}
 
