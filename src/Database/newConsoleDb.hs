@@ -88,52 +88,53 @@ insertCustomer = do
 
 updateCustomer :: ReaderT Connection IO()
 updateCustomer = do
-    conn <- ask
     liftIO $ putStrLn "Enter 1 to update single value\nEnter 2 to update entire customer\nEnter 0 to cancel update\n"
     ch <- liftIO $ getLine
     liftIO $ putStr "Enter Id of customer to update: "
     i <- liftIO $ getLine
     case ((readMaybe ch)::Maybe Int) of
-        Just 1 -> liftIO $ customerUpdateOne ((readMaybe i):: Maybe Integer) conn
-        Just 2 -> liftIO $ customerUpdateAll ((readMaybe i)::Maybe Integer) conn
+        Just 1 -> customerUpdateOne ((readMaybe i):: Maybe Integer)
+        Just 2 -> customerUpdateAll ((readMaybe i)::Maybe Integer)
         Just 0 -> liftIO $ putStrLn "Update cancelled.."
         _ -> liftIO $ putStrLn "Invalid choice"
 
-customerUpdateOne :: Maybe Integer -> Connection -> IO()
-customerUpdateOne nid conn = do
-    putStrLn "Enter 1 to update Customer Ref\nEnter 2 to update Title\nEnter 3 to update Fullname\nEnter 4 to update Email\nEnter 5 to update Phone\nEnter 6 to update Client Id\nEnter 7 to update Bookings\nEnter 0 to Cancel\n"
-    ch <- getLine
-    putStr "Enter New Value: "
-    val <- getLine
+customerUpdateOne :: Maybe Integer -> ReaderT Connection IO()
+customerUpdateOne nid = do
+    conn <- ask
+    liftIO $ putStrLn "Enter 1 to update Customer Ref\nEnter 2 to update Title\nEnter 3 to update Fullname\nEnter 4 to update Email\nEnter 5 to update Phone\nEnter 6 to update Client Id\nEnter 7 to update Bookings\nEnter 0 to Cancel\n"
+    ch <- liftIO $ getLine
+    liftIO $ putStr "Enter New Value: "
+    val <- liftIO $ getLine
     res <- case nid of
         Just newid -> case (readMaybe ch :: Maybe Int) of
-            Just 1 ->execute conn "UPDATE customers SET cref=upd.customer_ref FROM (VALUES (?,?)) as upd(uid,cref) WHERE id = upd.uid" (newid:: Integer,val)
-            Just 2 ->execute conn "UPDATE customers SET title=upd.utitle FROM (VALUES (?,?)) as upd(uid,utitle) WHERE id = upd.uid" (newid:: Integer,val)
-            Just 3 ->execute conn "UPDATE customers SET full_name=upd.ufname FROM (VALUES (?,?)) as upd(uid,ufname) WHERE id = upd.uid" (newid:: Integer,val)
-            Just 4 ->execute conn "UPDATE customers SET email=upd.uemail FROM (VALUES (?,?)) as upd(uid,uemail) WHERE id = upd.uid" (newid:: Integer,val)
-            Just 5 ->execute conn "UPDATE customers SET phone=upd.uphone FROM (VALUES (?,?)) as upd(uid,uphone) WHERE id = upd.uid" (newid:: Integer,val)
-            Just 6 ->execute conn "UPDATE customers SET client_id=upd.clid FROM (VALUES (?,?)) as upd(uid,clid) WHERE id = upd.uid" (newid:: Integer,read val :: Integer)
-            Just 7 ->execute conn "UPDATE customers SET no_of_bookings=upd.nob FROM (VALUES (?,?)) as upd(uid,nob) WHERE id = upd.uid" (newid:: Integer,read val :: Integer)
+            Just 1 ->liftIO $ execute conn "UPDATE customers SET cref=upd.customer_ref FROM (VALUES (?,?)) as upd(uid,cref) WHERE id = upd.uid" (newid:: Integer,val)
+            Just 2 ->liftIO $ execute conn "UPDATE customers SET title=upd.utitle FROM (VALUES (?,?)) as upd(uid,utitle) WHERE id = upd.uid" (newid:: Integer,val)
+            Just 3 ->liftIO $ execute conn "UPDATE customers SET full_name=upd.ufname FROM (VALUES (?,?)) as upd(uid,ufname) WHERE id = upd.uid" (newid:: Integer,val)
+            Just 4 ->liftIO $ execute conn "UPDATE customers SET email=upd.uemail FROM (VALUES (?,?)) as upd(uid,uemail) WHERE id = upd.uid" (newid:: Integer,val)
+            Just 5 ->liftIO $ execute conn "UPDATE customers SET phone=upd.uphone FROM (VALUES (?,?)) as upd(uid,uphone) WHERE id = upd.uid" (newid:: Integer,val)
+            Just 6 ->liftIO $ execute conn "UPDATE customers SET client_id=upd.clid FROM (VALUES (?,?)) as upd(uid,clid) WHERE id = upd.uid" (newid:: Integer,read val :: Integer)
+            Just 7 ->liftIO $ execute conn "UPDATE customers SET no_of_bookings=upd.nob FROM (VALUES (?,?)) as upd(uid,nob) WHERE id = upd.uid" (newid:: Integer,read val :: Integer)
             _ -> pure 0
         _-> pure 0
     if res > 0 then
-        putStrLn "Customer Updated"
+        liftIO $ putStrLn "Customer Updated"
     else
-        putStrLn "Update failed"
+        liftIO $ putStrLn "Update failed"
 
-customerUpdateAll :: Maybe Integer -> Connection -> IO()
-customerUpdateAll nid conn = 
+customerUpdateAll :: Maybe Integer -> ReaderT Connection IO()
+customerUpdateAll nid = 
     case nid of
         Just newid ->  do
-            newCustomer <- setCustomer
-            Customer{custId =_,custEmail =ce,custName =cn,custReff =cr,custTitle =ct,custPhone =cp,custClId =cl,custnBook =nb,custCreatedAt =ca,custUpdatedAt =ua } <- setCustId newid newCustomer
+            conn <- ask
+            newCustomer <- liftIO $ setCustomer
+            Customer{custId =_,custEmail =ce,custName =cn,custReff =cr,custTitle =ct,custPhone =cp,custClId =cl,custnBook =nb,custCreatedAt =ca,custUpdatedAt =ua } <- liftIO $ setCustId newid newCustomer
             res <- 
-                execute conn "UPDATE customers SET customer_ref=upd.cref,title=upd.utitle,full_name=upd.ufname,email=upd.uemail,phone=upd.uphone,client_id=upd.clid,number_of_bookings=upd.nob,created_at=upd.cat,updated_at=uat FROM (VALUES (?,?,?,?,?,?,?,?,?,?)) as upd(uid,cref,utitle,ufname,uemail,uphone,clid,nob,cat,uat) WHERE id = upd.uid" (newid,cr,ct,cn,ce,cp,cl::Integer,nb::Integer,ca,ua)
+                liftIO $ execute conn "UPDATE customers SET customer_ref=upd.cref,title=upd.utitle,full_name=upd.ufname,email=upd.uemail,phone=upd.uphone,client_id=upd.clid,number_of_bookings=upd.nob,created_at=upd.cat,updated_at=uat FROM (VALUES (?,?,?,?,?,?,?,?,?,?)) as upd(uid,cref,utitle,ufname,uemail,uphone,clid,nob,cat,uat) WHERE id = upd.uid" (newid,cr,ct,cn,ce,cp,cl::Integer,nb::Integer,ca,ua)
             if res > 0 then
-                putStrLn "Customer Updated"
+                liftIO $ putStrLn "Customer Updated"
             else
-                putStrLn "Update failed"
-        _-> putStrLn "Update failed"
+                liftIO $ putStrLn "Update failed"
+        _-> liftIO $ putStrLn "Update failed"
 
 deleteCustomer :: ReaderT Connection IO()
 deleteCustomer = do
