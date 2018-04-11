@@ -1,9 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Database.Consoledb where
+module Database.NewConsoledb where
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToRow
 import Database.PostgreSQL.Simple.ToField
+import Control.Monad as CM
+import Control.Monad.Reader
 import Data.Time.LocalTime
 import Data.List
 import Text.Read
@@ -43,11 +45,13 @@ instance ToRow Customer where
 dbConnection :: IO Connection
 dbConnection = connect ConnectInfo{connectHost ="localhost",connectPort = 5432,connectUser ="b2b",connectPassword ="b2b",connectDatabase ="b2b"}
 
-displayCustomer :: Connection -> IO ()
-displayCustomer conn = do
-    list <- query_ conn "SELECT id,customer_ref,title,full_name,email,phone,client_id,number_of_bookings,created_at,updated_at FROM customers" :: IO [Customer]
-    opStr <- pure $ intercalate "\n" (map (\Customer{custId=_,custEmail=e,custName=n,custReff=_,custTitle=_,custPhone=_,custClId=_,custnBook=_,custCreatedAt=_,custUpdatedAt=_} -> n++" "++e) list)
-    putStrLn opStr
+displayCustomers :: ReaderT Connection IO()
+displayCustomers = do
+    conn <- ask
+    --query_ conn "SELECT full_name,email FROM customers" :: IO [(String,String)]
+    list <- liftIO $ query_ conn "SELECT full_name,email FROM customers" :: ReaderT Connection IO [(String,String)]
+    opStr <- pure $ intercalate "\n" (map (\(fn,em) -> fn++" "++em) list)
+    liftIO $ putStrLn opStr
 
 setCustomer :: IO Customer
 setCustomer = do
@@ -72,26 +76,28 @@ setCustomer = do
 setCustId :: Integer -> Customer -> IO Customer
 setCustId i Customer{custId=_,custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=cid,custnBook=nob,custCreatedAt=ca,custUpdatedAt=ua} = pure Customer{custId=CustomerId (Just i),custEmail=em,custName=fn,custReff=cref,custTitle=tl,custPhone=ph,custClId=cid,custnBook=nob,custCreatedAt=ca,custUpdatedAt=ua}
 
-insertCustomer :: Connection -> IO ()
-insertCustomer conn = do
-    customer <- setCustomer
-    res <- execute conn "INSERT INTO customers (customer_ref,title,full_name,email,phone,client_id,number_of_bookings,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)" customer
+insertCustomer :: ReaderT Connection IO()
+insertCustomer = do
+    conn <- ask
+    customer <- liftIO $ setCustomer
+    res <- liftIO $ execute conn "INSERT INTO customers (customer_ref,title,full_name,email,phone,client_id,number_of_bookings,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)" customer
     if res > 0 then
-        putStrLn "Customer Inserted"
+        liftIO $ putStrLn "Customer Inserted"
     else
-        putStrLn "Insertion failed"
+        liftIO $ putStrLn "Insertion failed"
 
-updateCustomer :: Connection -> IO ()
-updateCustomer conn = do
-    putStrLn "Enter 1 to update single value\nEnter 2 to update entire customer\nEnter 0 to cancel update\n"
-    ch <- getLine
-    putStr "Enter Id of customer to update: "
-    i <- getLine
+updateCustomer :: ReaderT Connection IO()
+updateCustomer = do
+    conn <- ask
+    liftIO $ putStrLn "Enter 1 to update single value\nEnter 2 to update entire customer\nEnter 0 to cancel update\n"
+    ch <- liftIO $ getLine
+    liftIO $ putStr "Enter Id of customer to update: "
+    i <- liftIO $ getLine
     case ((readMaybe ch)::Maybe Int) of
-        Just 1 -> customerUpdateOne ((readMaybe i):: Maybe Integer) conn
-        Just 2 -> customerUpdateAll ((readMaybe i)::Maybe Integer) conn
-        Just 0 -> putStrLn "Update cancelled.."
-        _ -> putStrLn "Invalid choice" >> updateCustomer conn
+        Just 1 -> liftIO $ customerUpdateOne ((readMaybe i):: Maybe Integer) conn
+        Just 2 -> liftIO $ customerUpdateAll ((readMaybe i)::Maybe Integer) conn
+        Just 0 -> liftIO $ putStrLn "Update cancelled.."
+        _ -> liftIO $ putStrLn "Invalid choice"
 
 customerUpdateOne :: Maybe Integer -> Connection -> IO()
 customerUpdateOne nid conn = do
@@ -129,17 +135,18 @@ customerUpdateAll nid conn =
                 putStrLn "Update failed"
         _-> putStrLn "Update failed"
 
-deleteCustomer :: Connection -> IO ()
-deleteCustomer conn = do
-    putStr "Enter id of customer to delete: "
-    i <- getLine
+deleteCustomer :: ReaderT Connection IO()
+deleteCustomer = do
+    conn <- ask
+    liftIO $ putStr "Enter id of customer to delete: "
+    i <- liftIO $ getLine
     res <- case (readMaybe i :: Maybe Integer) of
-        Just v -> execute conn "DELETE FROM customers WHERE id = (?)" [v]
+        Just v -> liftIO $ execute conn "DELETE FROM customers WHERE id = (?)" [v]
         _ -> pure 0
     if res > 0 then
-        putStrLn "Customer Deleted"
+        liftIO $ putStrLn "Customer Deleted"
     else
-        putStrLn "Delete failed"
+        liftIO $ putStrLn "Delete failed"
 
 consoleDb :: IO()
 consoleDb = do
@@ -147,9 +154,9 @@ consoleDb = do
     ch <- getLine
     conn <- dbConnection
     case ((readMaybe ch)::Maybe Int) of
-        Just 1 -> insertCustomer conn
-        Just 2 -> updateCustomer conn 
-        Just 3 -> deleteCustomer conn 
-        Just 4 -> displayCustomer conn
+        Just 1 -> runReaderT insertCustomer conn
+        Just 2 -> runReaderT updateCustomer conn
+        Just 3 -> runReaderT deleteCustomer conn
+        Just 4 -> runReaderT displayCustomers conn
         Just 0 -> putStrLn "Exiting..."
         _ -> putStrLn "Invalid choice" >> consoleDb
