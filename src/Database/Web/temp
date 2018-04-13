@@ -1,0 +1,26 @@
+body_
+            (do div_ [id_ "header",style_ "color:red"] "Form Customer"
+                form_ [id_ "insertCustomer"] table_
+                    (do 
+                        tr_ (do
+                            td_ (label_ "Customer Reference: ")
+                            td_ (input_ [type_ "text",name_ "customerreff"]))
+                        tr_ (do
+                            td_ (label_ "Title: ")
+                            td_ (input_ [type_ "text",name_ "title"]))
+                        tr_ (do
+                            td_ (label_ "FullName: ")
+                            td_ (input_ [type_ "text",name_ "fullname"]))
+                        tr_ (do
+                            td_ (label_ "Email: ")
+                            td_ (input_ [type_ "text",name_ "email"]))
+                        tr_ (do
+                            td_ (label_ "Phone: ")
+                            td_ (input_ [type_ "text",name_ "phone"]))
+                        tr_ (do
+                            td_ (label_ "Client ID: ")
+                            td_ (input_ [type_ "text",name_ "clientid"]))
+                        tr_ (do
+                            td_ (label_ "Number of Bookings: ")
+                            td_ (input_ [type_ "text",name_ "numberofbookings"]))
+                            )))

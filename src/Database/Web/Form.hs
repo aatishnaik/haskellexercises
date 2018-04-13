@@ -6,7 +6,6 @@ import Lucid.Base
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Control.Monad.Reader
-import Data.Functor.Identity
 import Prelude hiding (id)
 data Customer = Customer {
     custId :: Integer,
@@ -42,8 +41,8 @@ customerPage list =
                     table_ 
                         (do 
                             tr_ 
-                                (do td_ "name"
-                                    td_ "email")
+                                (do th_ "name"
+                                    th_ "email")
                             mapM_ (\c ->
                                 let (v1,v2)=customerToHtml c
                                 in tr_ $ do td_ v1 
@@ -91,7 +90,25 @@ customerForm =
                         input_ [type_ "text",name_ "clientid"]
                         br_ []
                         label_ "Number of Bookings: "
-                        input_ [type_ "text",name_ "numberofbookings"]
+                        input_ [type_ "number",name_ "numberofbookings"]
                         br_ [] 
+                        input_ [ name_ "submit",type_ "submit",value_ "Submit"]
+                            )))
+
+customerUpdateOne :: Html()
+customerUpdateOne =
+    html_
+    (do head_
+            (do title_ "New Customer"
+                link_ [rel_ "stylesheet",type_ "text/css",href_ ""]
+                )
+        body_
+            (do div_ [id_ "header",style_ "color:red"] "Form Customer"
+                form_ [id_ "insertCustomer"]
+                    (do 
+                        br_ []
+                        label_ "Enter Value "
+                        input_ [type_ "text",name_ "value"]
+                        br_ []
                         input_ [ name_ "submit",type_ "submit",value_ "Submit"]
                             )))
