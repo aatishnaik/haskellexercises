@@ -29,7 +29,6 @@ instance Foldable Node where
     --foldMap _ Empty = mempty
     --foldMap func (Element val nxt) = mconcat (fmap (\x -> [func x]) (Element val nxt))
     Node x ll2 -> (fn x) mappend (foldMap fn ll2)
-
     Empty -> mempty – TODO – think about this? LLNode x ll2 -> (fn x) mappend (foldMap fn ll2)
 
 

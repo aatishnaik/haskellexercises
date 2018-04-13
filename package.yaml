@@ -43,6 +43,8 @@ dependencies:
 - either
 - postgresql-simple
 - time
+- lucid
+- servant
 
 library:
   source-dirs: src
