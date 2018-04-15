@@ -45,6 +45,14 @@ dependencies:
 - time
 - lucid
 - servant
+- servant-server
+- wai
+- warp
+- http-media
+- blaze-html
+- blaze-markup
+- attoparsec
+- string-conversions
 
 library:
   source-dirs: src
