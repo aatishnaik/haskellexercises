@@ -1,26 +1,148 @@
-body_
-            (do div_ [id_ "header",style_ "color:red"] "Form Customer"
-                form_ [id_ "insertCustomer"] table_
-                    (do 
-                        tr_ (do
-                            td_ (label_ "Customer Reference: ")
-                            td_ (input_ [type_ "text",name_ "customerreff"]))
-                        tr_ (do
-                            td_ (label_ "Title: ")
-                            td_ (input_ [type_ "text",name_ "title"]))
-                        tr_ (do
-                            td_ (label_ "FullName: ")
-                            td_ (input_ [type_ "text",name_ "fullname"]))
-                        tr_ (do
-                            td_ (label_ "Email: ")
-                            td_ (input_ [type_ "text",name_ "email"]))
-                        tr_ (do
-                            td_ (label_ "Phone: ")
-                            td_ (input_ [type_ "text",name_ "phone"]))
-                        tr_ (do
-                            td_ (label_ "Client ID: ")
-                            td_ (input_ [type_ "text",name_ "clientid"]))
-                        tr_ (do
-                            td_ (label_ "Number of Bookings: ")
-                            td_ (input_ [type_ "text",name_ "numberofbookings"]))
-                            )))
+List of relations
+ Schema |                  Name                  | Type  | Owner 
+--------+----------------------------------------+-------+-------
+ public | accounting_accounts                    | table | b2b
+ public | accounting_batches                     | table | b2b
+ public | accounting_entries                     | table | b2b
+ public | accounting_logs                        | table | b2b
+ public | accounting_payments                    | table | b2b
+ public | accounting_pg_settlements              | table | b2b
+ public | accounting_scheduled_reports           | table | b2b
+ public | accounting_statements                  | table | b2b
+ public | active_admin_comments                  | table | b2b
+ public | additional_values                      | table | b2b
+ public | addons                                 | table | b2b
+ public | addons_trips                           | table | b2b
+ public | admin_brandings                        | table | b2b
+ public | agent_dl_mappings                      | table | b2b
+ public | audits                                 | table | b2b
+ public | availability_functions                 | table | b2b
+ public | banner_slides                          | table | b2b
+ public | batches                                | table | b2b
+ public | billing_plans                          | table | b2b
+ public | campaign_subscription_status           | table | b2b
+ public | channel_logs                           | table | b2b
+ public | channels                               | table | b2b
+ public | client_agents                          | table | b2b
+ public | clients                                | table | b2b
+ public | collections                            | table | b2b
+ public | contacts                               | table | b2b
+ public | coupon_customer_restrictions           | table | b2b
+ public | coupons                                | table | b2b
+ public | coupons_hotels_rooms                   | table | b2b
+ public | coupons_trips                          | table | b2b
+ public | current_eu_bank_rates                  | table | b2b
+ public | customers                              | table | b2b
+ public | customers_tags                         | table | b2b
+ public | date_restrictions                      | table | b2b
+ public | delayed_jobs                           | table | b2b
+ public | distributed_trip_pricings              | table | b2b
+ public | distribution_lists                     | table | b2b
+ public | dl_trip_mappings                       | table | b2b
+ public | emails                                 | table | b2b
+ public | enabled_payment_gateways               | table | b2b
+ public | engagements                            | table | b2b
+ public | eu_bank_rates                          | table | b2b
+ public | event_log                              | table | b2b
+ public | external_refs                          | table | b2b
+ public | file_attachments                       | table | b2b
+ public | flexi_payment_recipients               | table | b2b
+ public | flexi_payment_refs                     | table | b2b
+ public | flexi_payments                         | table | b2b
+ public | form_ulator_custom_fields              | table | b2b
+ public | form_ulator_custom_fields_custom_forms | table | b2b
+ public | form_ulator_custom_forms               | table | b2b
+ public | guest_configs                          | table | b2b
+ public | guest_types                            | table | b2b
+ public | hotel_bookings                         | table | b2b
+ public | hotel_coupons                          | table | b2b
+ public | hotel_pricings                         | table | b2b
+ public | hotel_pricings_package_pricings        | table | b2b
+ public | hotel_rate_plans                       | table | b2b
+ public | hotels                                 | table | b2b
+ public | hotels_availability_calendars          | table | b2b
+ public | hrc_rate_calendars                     | table | b2b
+ public | hrc_rate_data                          | table | b2b
+ public | itinerary_addon_engagements            | table | b2b
+ public | itinerary_bookings                     | table | b2b
+ public | itinerary_departures                   | table | b2b
+ public | itinerary_passengers                   | table | b2b
+ public | itinerary_pax_engagements              | table | b2b
+ public | itinerary_pricing_items                | table | b2b
+ public | itinerary_room_engagements             | table | b2b
+ public | itinerary_tax_rules                    | table | b2b
+ public | jobs                                   | table | b2b
+ public | json_schemas                           | table | b2b
+ public | marketing_geo_ips                      | table | b2b
+ public | marketplace_settings                   | table | b2b
+ public | mc_mailchimp_accounts                  | table | b2b
+ public | mc_mailchimp_list_mergevars            | table | b2b
+ public | mc_mailchimp_lists                     | table | b2b
+ public | open_slots                             | table | b2b
+ public | package_pricings                       | table | b2b
+ public | page_type_settings                     | table | b2b
+ public | participants                           | table | b2b
+ public | pax_types                              | table | b2b
+ public | payment_gateway_settings               | table | b2b
+ public | payments                               | table | b2b
+ public | paypal_exchange_rates                  | table | b2b
+ public | paypal_history                         | table | b2b
+ public | pending_actions                        | table | b2b
+ public | pending_agent_invites                  | table | b2b
+ public | per_booking_pricings                   | table | b2b
+ public | per_pax_pricings                       | table | b2b
+ public | permissions                            | table | b2b
+ public | permissions_roles                      | table | b2b
+ public | permissions_roles_users                | table | b2b
+ public | photo_attachments                      | table | b2b
+ public | photos                                 | table | b2b
+ public | plan_upgrade_payments                  | table | b2b
+ public | plugin_auth_registry                   | table | b2b
+ public | poll_delayed_job_results               | table | b2b
+ public | pricing_items                          | table | b2b
+ public | queued_mails                           | table | b2b
+ public | queued_sms                             | table | b2b
+ public | rails_admin_histories                  | table | b2b
+ public | resale_contracts                       | table | b2b
+ public | roles                                  | table | b2b
+ public | room_counts                            | table | b2b
+ public | room_types                             | table | b2b
+ public | scheduled_reports                      | table | b2b
+ public | schema_migrations                      | table | b2b
+ public | search_settings                        | table | b2b
+ public | section_attachments                    | table | b2b
+ public | sections                               | table | b2b
+ public | sendgrid_senders                       | table | b2b
+ public | sendgrid_subusers                      | table | b2b
+ public | sendgrid_webhook_event_log             | table | b2b
+ public | sendgrid_whitelabels                   | table | b2b
+ public | static_pages                           | table | b2b
+ public | storefront_route_sections              | table | b2b
+ public | storefront_routes                      | table | b2b
+ public | supplier_contacts                      | table | b2b
+ public | supplier_profile_files                 | table | b2b
+ public | supplier_profiles                      | table | b2b
+ public | tags                                   | table | b2b
+ public | team_members                           | table | b2b
+ public | templates                              | table | b2b
+ public | testimonials                           | table | b2b
+ public | translations                           | table | b2b
+ public | transport_pricings                     | table | b2b
+ public | trial_signups                          | table | b2b
+ public | trip_allocations                       | table | b2b
+ public | trip_events                            | table | b2b
+ public | trip_option_pricing_rules              | table | b2b
+ public | trip_options                           | table | b2b
+ public | trip_pricings                          | table | b2b
+ public | trip_widgets                           | table | b2b
+ public | trips                                  | table | b2b
+ public | trips_collections                      | table | b2b
+ public | unlocodes                              | table | b2b
+ public | url_redirects                          | table | b2b
+ public | user_devices                           | table | b2b
+ public | users                                  | table | b2b
+ public | viator_booking_data                    | table | b2b
+ public | viator_suppliers                       | table | b2b
+ public | videos                                 | table | b2b
+ public | vl_admin_users                         | table | b2b
+ public | website_settings

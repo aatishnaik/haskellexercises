@@ -53,6 +53,12 @@ dependencies:
 - blaze-markup
 - attoparsec
 - string-conversions
+- servant-blaze
+- servant-lucid
+- servant-client
+- http-client
+- base-compat
+- http-api-data
 
 library:
   source-dirs: src

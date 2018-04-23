@@ -15,27 +15,27 @@ import GHC.Generics
 import Network.Wai.Handler.Warp
 import Servant
 
-data User = User
-    { name :: String
-    , age :: Int
-    , email :: String
+data Customer = Customer
+    { custid :: Int,
+      custname :: String,
+      custemail :: String
     } deriving (Eq, Show, Generic)
 
-instance ToJSON User
+instance ToJSON Customer
 
-users :: [User]
-users =
-  [ User {name="abcn",age=13,email="abc@abc.com"}
-  , User {name="bbc",age=34,email="bbc@bbc.com"}
+customers  :: [Customer]
+customers  =
+  [ Customer {custid=13,custname="abcn",custemail="abc@abc.com"}
+  , Customer {custid=34,custname="bbc",custemail="bbc@bbc.com"}
   ]
 
-type UserAPI = "users" :> Get '[JSON] [User]
+type CustomerAPI = "customers" :> Get '[JSON] [Customer]
 
-server :: Server UserAPI
-server = return users
+server :: Server CustomerAPI
+server = return customers
 
-userAPI :: Proxy UserAPI
-userAPI = Proxy
+customerAPI :: Proxy CustomerAPI
+customerAPI = Proxy
 
 main :: IO ()
-main = run 8081 (serve userAPI server)
+main = run 8081 (serve customerAPI server)

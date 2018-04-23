@@ -1,9 +1,12 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE OverloadedStrings, ExtendedDefaultRules #-}
-module Test where
-import Lucid.Base
-import Servant.Client
+
+module T3 where
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -13,61 +16,38 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Control.Monad.Reader
 import Prelude hiding (id)
-
+import GHC.Generics
 data Customer = Customer {
     custId :: Integer,
-    custReff :: String,
-    custTitle :: String,
-    custFullName:: String,
     custEmail :: String,
-    custClientId :: Integer,
-    custNumberOfBookings :: Integer
-}deriving (Show)
+    custName :: String
+}deriving (Show,Eq)
 
-instance FromRow Customer where
-    fromRow = do
-        id <- field
-        customer_ref <- field
-        title <- field
-        full_name <- field
-        email <- field
-        client_id <- field
-        number_of_bookings <- field
-        pure $ Customer{custId=id,custReff=customer_ref,custTitle=title,custFullName=full_name,custEmail=email,custClientId =client_id,custNumberOfBookings=number_of_bookings}
+type API = 
+    "index" :> PageAPI
+    :<|> "check" :> ViewAPI
 
-dbConnection :: IO Connection
-dbConnection = connect ConnectInfo{connectHost ="localhost",connectPort = 5432,connectUser ="b2b",connectPassword ="b2b",connectDatabase ="b2b"}
+type PageAPI =   Get '[HTML] (Html())
+    :<|>"check"
+        :> ReqBody '[FormUrlEncoded] Customer
+        :> Post '[HTML] Html
+type ViewAPI = "view_customers" :> Get '[HTML] (Html())
 
-{-type InsertAPI = "insertCust" :> Get '[HTML] Html
-  :> Capture "custId" Integer
-  :> Capture "custCustomerRef" String
-  :> Capture "custTitle" String
-  :> Capture "custFullName" String
-  :> Capture "custEmail" String
-  :> Capture "custPhone" String
-  :> Capture "custClientId" Integer
-  :> Capture "custNumberOfBookings" Integer
-  :> Post '[HTML] Customer
+server :: Server API
+server = pgServer
+pgServer :: Server PageAPI
+pgServer = return insertPg
+api :: Proxy API
+api = Proxy
 
-customer :: Integer -> String -> String -> String -> String -> Integer -> Integer -> Customer
-customer cid cref ctit cfn cemail ccid cnob = Customer {
-  custId =cid,
-  custReff =cref,
-  custTitle =ctit,
-  custFullName =cfn,
-  custEmail =cemail,
-  custClientId =ccid,
-  custNumberOfBookings =cnob
-}-}
+app :: Application
+app = serve api server
 
-data InsertPg = InsertPg
-type InsertAPI = "insert_customer" :> Get '[HTML] InsertPg
+main :: IO ()
+main = run 8081 app
 
-insertServer :: Server InsertPg
-insertServer =  return InsertAPI
-
-customerForm :: Html()
-customerForm  =
+insertPg :: Html()
+insertPg = 
     html_
     (do head_
             (do title_ "New Customer"

@@ -7,6 +7,7 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Control.Monad.Reader
 import Prelude hiding (id)
+
 data Customer = Customer {
     custId :: Integer,
     custEmail :: String,
@@ -58,9 +59,8 @@ displayCustomerPage = do
     conn <- dbConnection
     fmap (\c->customerPage c) (runReaderT getCustomers conn)
 
-
 customerForm :: Html()
-customerForm =
+customerForm  =
     html_
     (do head_
             (do title_ "New Customer"
@@ -106,6 +106,12 @@ customerUpdateOne =
             (do div_ [id_ "header",style_ "color:red"] "Form Customer"
                 form_ [id_ "insertCustomer"]
                     (do 
+                        br_ []
+                        label_ "Choose  customer: "
+                        {-select_
+                        do (mapM_ (\c ->
+                            let (v1,v2)=customerToHtml c
+                            in li_ v1) list)-}
                         br_ []
                         label_ "Enter Value "
                         input_ [type_ "text",name_ "value"]
