@@ -1,0 +1,89 @@
+name:                exercises
+version:             0.1.0.0
+github:              githubuser/exercises
+license:             BSD3
+author:              Author name here
+maintainer:          example@example.com
+copyright:           2017 Author name here
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/githubuser/exercises#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- containers
+- split
+- text
+- cassava
+- bytestring
+- vector
+- lens
+- wreq
+- aeson
+- twitter-conduit
+- conduit
+- twitter-types-lens
+- http-types
+- directory
+- filepath
+- mtl
+- string-conv
+- transformers
+- monad-control
+- either
+- postgresql-simple
+- time
+- lucid
+- servant
+- servant-server
+- wai
+- warp
+- http-media
+- blaze-html
+- blaze-markup
+- attoparsec
+- string-conversions
+- servant-blaze
+- servant-lucid
+- servant-client
+- http-client
+- base-compat
+- http-api-data
+
+library:
+  source-dirs: src
+  ghc-options:
+  - -Wall
+
+
+executables:
+  exercises-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - exercises
+
+tests:
+  exercises-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - exercises

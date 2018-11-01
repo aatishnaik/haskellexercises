@@ -1,1 +1,1 @@
-# haskellexercises
+# exercises
